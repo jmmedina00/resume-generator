@@ -1,0 +1,28 @@
+{
+  "name": "resume-generator",
+  "version": "1.0.0",
+  "description": "Generate my JSON resume in different versions and languages",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "resume",
+    "cv",
+    "curriculum",
+    "json-resume"
+  ],
+  "author": "Juan Miguel Medina Prieto",
+  "license": "MIT",
+  "dependencies": {
+    "prettier": "^2.8.7",
+    "resumed": "^3.0.1",
+    "yaml": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@types/prettier": "^2.7.2",
+    "typescript": "^5.0.3"
+  }
+}
