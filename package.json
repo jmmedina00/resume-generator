@@ -16,6 +16,7 @@
   "author": "Juan Miguel Medina Prieto",
   "license": "MIT",
   "dependencies": {
+    "iso-639-1": "^2.1.15",
     "prettier": "^2.8.7",
     "resumed": "^3.0.1",
     "yaml": "^2.2.1"

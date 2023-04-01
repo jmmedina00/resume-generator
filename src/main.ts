@@ -1,17 +1,20 @@
 import { readFile, writeFile } from 'fs/promises';
 import { Options, format, resolveConfig } from 'prettier';
-import { parseDocument } from 'yaml';
+import { parse } from 'yaml';
+import { getFlattenedObjectAndLocales } from './locale';
 
 const main = async () => {
   const file = await readFile('./test.yml', 'utf-8');
-  const testYaml = parseDocument(file);
+  const testYaml = parse(file);
 
-  const node = testYaml.toJS()['foo'] as object;
-  const combined = { ...node, shi: 'yang', bar: 'baz' };
+  const { flattened, locales } = getFlattenedObjectAndLocales(testYaml);
+
+  console.log(flattened);
+  console.log(locales);
 
   const config = (await resolveConfig('.prettierrc')) as Options;
 
-  await writeFile('./test.json', format(JSON.stringify(combined), config));
+  await writeFile('./test.json', format(JSON.stringify(testYaml), config));
 };
 
 main();
