@@ -1,6 +1,5 @@
 import { LanguageCode } from 'iso-639-1';
-
-export type Entry = [key: string, value: any];
+import { Entry } from './common';
 
 export type LocaleMap = {
   [key in LanguageCode]?: object;

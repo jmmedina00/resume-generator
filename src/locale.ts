@@ -1,10 +1,6 @@
 import locale, { LanguageCode } from 'iso-639-1';
-import {
-  Entry,
-  EntryLocaliser,
-  LocaleMap,
-  LocalisedObject,
-} from './locale.types';
+import { EntryLocaliser, LocaleMap, LocalisedObject } from './locale.types';
+import { Entry, regenerateFromEntries } from './common';
 
 const codes = locale.getAllCodes() as string[];
 
@@ -56,11 +52,10 @@ const getLocalisedObject: EntryLocaliser = ([key, object]) => {
   });
 
   const flattenedEntries = localisedEntries.map(({ flattened }) => flattened);
-
-  const localisedObject =
-    Object.getPrototypeOf(object) === Object.getPrototypeOf([])
-      ? flattenedEntries.map(([_, value]) => value)
-      : Object.fromEntries(flattenedEntries);
+  const localisedObject = regenerateFromEntries(
+    flattenedEntries,
+    Object.getPrototypeOf(object)
+  );
 
   const localeList = localisedEntries.map(({ locales }) => locales);
   const crushedLocales = localeList.reduce(crushLocaleMapsTogether, {});
