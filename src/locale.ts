@@ -1,57 +1,87 @@
 import locale, { LanguageCode } from 'iso-639-1';
+import {
+  Entry,
+  EntryLocaliser,
+  LocaleMap,
+  LocalisedObject,
+} from './locale.types';
 
 const codes = locale.getAllCodes() as string[];
 
-type LocaleMap = {
-  [key in LanguageCode]?: object;
+const crushLocaleMapsTogether = (finalMap: LocaleMap, map: LocaleMap) => {
+  const finalKeys = Object.keys(finalMap) as LanguageCode[];
+  const currentKeys = Object.keys(map) as LanguageCode[];
+  const uniqueKeys = new Set([...finalKeys, ...currentKeys]);
+
+  const mergedEntries = [...uniqueKeys].map((locale) => [
+    locale,
+    { ...finalMap[locale], ...map[locale] },
+  ]);
+
+  return Object.fromEntries(mergedEntries);
 };
 
-export interface LocalisedObject {
-  flattened: object;
-  locales: LocaleMap;
-}
+const getProperLocaliser = (value: any) => {
+  if (['string', 'number'].includes(typeof value)) {
+    return getEntryAsIs;
+  }
 
-const isLocalisedString = (object: any): boolean => {
-  return Object.keys(object).every((value) => codes.includes(value));
+  if (Object.keys(value).every((key) => codes.includes(key))) {
+    return getEntryWithLocalesStripped;
+  }
+
+  return getLocalisedObject;
+};
+
+const getEntryAsIs: EntryLocaliser = (entry) => ({
+  flattened: entry,
+  locales: {},
+});
+
+const getEntryWithLocalesStripped: EntryLocaliser = ([key, value]) => {
+  const flattened: Entry = [key, key];
+
+  const localeEntries = Object.entries(value).map(([locale, message]) => [
+    locale,
+    { [key]: message },
+  ]);
+
+  return { flattened, locales: Object.fromEntries(localeEntries) as LocaleMap };
+};
+
+const getLocalisedObject: EntryLocaliser = ([key, object]) => {
+  const localisedEntries = Object.entries(object).map((entry) => {
+    const [_, value] = entry;
+    return getProperLocaliser(value)(entry);
+  });
+
+  const flattenedEntries = localisedEntries.map(({ flattened }) => flattened);
+
+  const localisedObject =
+    Object.getPrototypeOf(object) === Object.getPrototypeOf([])
+      ? flattenedEntries.map(([_, value]) => value)
+      : Object.fromEntries(flattenedEntries);
+
+  const localeList = localisedEntries.map(({ locales }) => locales);
+  const crushedLocales = localeList.reduce(crushLocaleMapsTogether, {});
+
+  const locales = !key
+    ? crushedLocales
+    : Object.fromEntries(
+        Object.entries(crushedLocales).map(([locale, value]) => [
+          locale,
+          { [key]: value },
+        ])
+      );
+
+  return { flattened: [key, localisedObject], locales };
 };
 
 export const getFlattenedObjectAndLocales = (object: any): LocalisedObject => {
-  const entries = Object.entries(object);
-  let locales: any = {};
-  let extractedEntries = [];
+  const {
+    flattened: [_, flattened],
+    locales,
+  } = getLocalisedObject(['', object]);
 
-  for (const [key, value] of entries) {
-    if (['string', 'number'].includes(typeof value)) {
-      extractedEntries.push([key, value]);
-      continue;
-    }
-
-    if (isLocalisedString(value)) {
-      extractedEntries.push([key, key]);
-
-      for (const [locale, message] of Object.entries(value as object)) {
-        if (!locales[locale]) {
-          locales[locale] = {};
-        }
-
-        locales[locale][key] = message;
-      }
-      continue;
-    }
-
-    const { flattened: extracted, locales: extractedLocales } =
-      getFlattenedObjectAndLocales(value);
-
-    extractedEntries.push([key, extracted]);
-
-    for (const [locale, values] of Object.entries(extractedLocales as object)) {
-      if (!locales[locale]) {
-        locales[locale] = {};
-      }
-
-      locales[locale][key] = values;
-    }
-  }
-
-  return { flattened: Object.fromEntries(extractedEntries), locales };
+  return { flattened, locales };
 };

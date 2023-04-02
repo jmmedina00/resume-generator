@@ -130,4 +130,31 @@ describe('Object locale', () => {
     expect(flattened).toEqual(expectedFlattened);
     expect(locales).toEqual(expectedLocales);
   });
+
+  it('should return array in flattened when provided parameter is array', () => {
+    const subject = [
+      'one',
+      'two',
+      {
+        en: 'three',
+        es: 'tres',
+      },
+      'cuatro',
+      {
+        en: 'five',
+        es: 'cinco',
+      },
+    ];
+
+    const expectedFlattened = ['one', 'two', '2', 'cuatro', '4'];
+    const expectedLocales = {
+      es: { 2: 'tres', 4: 'cinco' },
+      en: { 2: 'three', 4: 'five' },
+    };
+
+    const { flattened, locales } = getFlattenedObjectAndLocales(subject);
+
+    expect(flattened).toEqual(expectedFlattened);
+    expect(locales).toEqual(expectedLocales);
+  });
 });
