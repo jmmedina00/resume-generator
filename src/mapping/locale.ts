@@ -1,6 +1,6 @@
 import locale, { LanguageCode } from 'iso-639-1';
 import { EntryLocaliser, LocaleMap, LocalisedObject } from './locale.types';
-import { Entry, regenerateFromEntries } from './common';
+import { Entry, regenerateFromEntries } from '../common';
 
 const codes = locale.getAllCodes() as string[];
 

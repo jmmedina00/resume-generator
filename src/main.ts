@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'fs/promises';
 import { Options, format, resolveConfig } from 'prettier';
 import { parse } from 'yaml';
-import { getFlattenedObjectAndLocales } from './locale';
+import { getFlattenedObjectAndLocales } from './mapping/locale';
 
 const main = async () => {
   const file = await readFile('./test.yml', 'utf-8');
