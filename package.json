@@ -24,6 +24,7 @@
     "yaml": "^2.2.1"
   },
   "devDependencies": {
+    "@octokit/openapi-types": "^16.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
     "@types/prettier": "^2.7.2",
