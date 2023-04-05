@@ -57,6 +57,34 @@ describe('Web requests', () => {
   );
 
   it.each(['get', 'post'])(
+    'should be able to do authorized %s with extra headers',
+    async (method) => {
+      nock('http://authenticated.local', {
+        reqheaders: {
+          Authorization: 'Supercalifragilisticexpialidocious',
+          Sound: 'Meow',
+        },
+      })
+        .get('/')
+        .reply(200, { message: 'Authorized', code: 3 })
+        .post('/')
+        .reply(200, { message: 'Authorized', code: 4 });
+      const expected = { message: 'Authorized', code: method.length };
+
+      const authorized = () => 'Supercalifragilisticexpialidocious';
+      const requester = getAuthorizedRequester(authorized);
+
+      const actual = await requester[method]<typeof expected>(
+        'http://authenticated.local',
+        {},
+        { Sound: 'Meow' }
+      );
+
+      expect(actual).toEqual(expected);
+    }
+  );
+
+  it.each(['get', 'post'])(
     'should be able to receive plain text via %s as well',
     async (method) => {
       nock('http://authenticated.local')
