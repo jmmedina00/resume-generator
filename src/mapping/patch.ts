@@ -1,4 +1,4 @@
-import { Entry, regenerateFromEntries } from '../common';
+import { Entry, regenerateFromEntries } from './common';
 
 export const patchObject = (
   flatObject: Object,

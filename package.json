@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "ts-node src/main.ts",
-    "test": "jest"
+    "test": "jest",
+    "redact": "ts-node src/decrypt-file.ts && diff -q private.yml private.yml.tmp || ts-node src/encrypt-file.ts "
   },
   "keywords": [
     "resume",
