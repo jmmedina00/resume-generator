@@ -2,7 +2,9 @@ import { readFile, writeFile } from 'fs/promises';
 import { parse } from 'yaml';
 import { getFlattenedObjectAndLocales } from './mapping/locale';
 import dotenv from 'dotenv';
-import { convertToPrettyJSON } from './prettier';
+import { Renderable, generateFromTemplate } from './render/navbar';
+import { addAtBodyTop } from './render';
+import { prettify } from './prettier';
 
 const main = async () => {
   dotenv.config();
@@ -15,7 +17,21 @@ const main = async () => {
   console.log(flattened);
   console.log(locales);
 
-  await writeFile('./test.json', await convertToPrettyJSON(testYaml));
+  const items: Renderable[] = [
+    { code: 'en', label: 'English', selected: true },
+    { code: 'es', label: 'Español', selected: false },
+  ];
+
+  const template = await readFile('./assets/navbar.html', 'utf-8');
+  const rendered = await readFile('./resume.html', 'utf-8');
+
+  const filledTemplate = generateFromTemplate(template, items);
+  const finished = addAtBodyTop(rendered, filledTemplate);
+
+  await writeFile(
+    './finish.html',
+    await prettify(finished, { parser: 'html' })
+  );
 };
 
 main();
