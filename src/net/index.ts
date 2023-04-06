@@ -1,22 +1,27 @@
 import axios from 'axios';
 import { Authorization } from './auth';
 
-export interface Requester {
-  [key: string]: <T>(url: string, data?: any, headers?: any) => Promise<T>;
+export interface RequestData {
+  params?: { [key: string]: string };
+  body?: any;
+  headers?: { [key: string]: string };
 }
 
-export const getAuthorizedRequester = (auth: Authorization): Requester => ({
-  get: async <T>(url: string, data: any = {}, headers?: any) =>
+export type Requester = <T>(
+  method: string,
+  url: string,
+  data?: RequestData
+) => Promise<T>;
+
+export const getAuthorizedRequester =
+  (auth: Authorization): Requester =>
+  async (method, url, { params = {}, body = {}, headers = {} } = {}) =>
     (
-      await axios.get<T>(url, {
-        params: data,
+      await axios.request({
+        method,
+        url,
+        params,
+        data: body,
         headers: { Authorization: auth(), ...headers },
       })
-    ).data,
-  post: async <T>(url: string, data: any = {}, headers?: any) =>
-    (
-      await axios.post<T>(url, data, {
-        headers: { Authorization: auth(), ...headers },
-      })
-    ).data,
-});
+    ).data;

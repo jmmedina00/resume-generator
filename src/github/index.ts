@@ -14,7 +14,7 @@ const BASE_URL = 'https://api.github.com';
 const getUser = (
   requester: Requester
 ): Promise<components['schemas']['public-user']> =>
-  requester.get(BASE_URL + '/user');
+  requester('get', BASE_URL + '/user');
 
 export const getCoreUserInfo = async (): Promise<GithubUserInfo> => {
   const requester = getAuthorizedGitHub();
@@ -33,7 +33,7 @@ export const getRepoDescription = async (repo: string): Promise<string> => {
   const { login: owner } = await getUser(requester);
 
   const { description }: components['schemas']['full-repository'] =
-    await requester.get(BASE_URL + `/repos/${owner}/${repo}`);
+    await requester('get', BASE_URL + `/repos/${owner}/${repo}`);
 
   return description ?? '';
 };
@@ -46,7 +46,10 @@ export const getFileFromRepo = async (
   const { login: owner } = await getUser(requester);
 
   const { download_url }: components['schemas']['content-file'] =
-    await requester.get(BASE_URL + `/repos/${owner}/${repo}/contents/${path}`);
+    await requester(
+      'get',
+      BASE_URL + `/repos/${owner}/${repo}/contents/${path}`
+    );
 
-  return requester.get(download_url ?? '');
+  return requester('get', download_url ?? '');
 };
