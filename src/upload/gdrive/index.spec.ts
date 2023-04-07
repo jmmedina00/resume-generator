@@ -1,14 +1,18 @@
 import { createReadStream } from 'fs';
 import { getAuthorizedGoogle } from './auth';
-import { removeAllFilesFromFolder, uploadFile } from '.';
+import {
+  getFileContents,
+  removeAllFilesFromFolder,
+  updateFile,
+  uploadFile,
+} from '.';
 import FormData from 'form-data';
 
 jest.mock('./auth');
 jest.mock('fs');
 
-const UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files';
-const LIST_URL = 'https://www.googleapis.com/drive/v3/files';
-const DELETE_URL = 'https://www.googleapis.com/drive/v3/files/';
+const UPLOAD_URL = 'https://www.googleapis.com/upload/drive/v3/files/';
+const NORMAL_URL = 'https://www.googleapis.com/drive/v3/files/';
 
 describe('Google Drive uploading', () => {
   it("should be able to provide everything in one sit to Google's liking", async () => {
@@ -71,11 +75,45 @@ describe('Google Drive uploading', () => {
 
     const foo = await removeAllFilesFromFolder();
 
-    expect(requester).toHaveBeenCalledWith('get', LIST_URL, {
+    expect(requester).toHaveBeenCalledWith('get', NORMAL_URL, {
       params: { q: `'MyFolder' in parents` },
     });
     fileIds.forEach((id) => {
-      expect(requester).toHaveBeenCalledWith('delete', DELETE_URL + id);
+      expect(requester).toHaveBeenCalledWith('delete', NORMAL_URL + id);
+    });
+  });
+
+  it('should be able to get existing file contents', async () => {
+    const id = 'foo';
+    const contents = 'THis is a very complex file';
+
+    const requester = jest.fn().mockImplementation((method, url, data) => {
+      if (method === 'get') return contents;
+    });
+    (getAuthorizedGoogle as jest.Mock).mockReturnValue(requester);
+
+    const result = await getFileContents(id);
+    expect(result).toEqual(contents);
+    expect(requester).toHaveBeenCalledWith('get', NORMAL_URL + id, {
+      params: { alt: 'media' },
+    });
+  });
+
+  it('should be able to update existing file contents', async () => {
+    const id = 'bar';
+    const fileName = './test.txt';
+    const newContents = 'This is my new contents';
+
+    const requester = jest.fn().mockImplementation((method, url, data) => {});
+    (getAuthorizedGoogle as jest.Mock).mockReturnValue(requester);
+    (createReadStream as jest.Mock).mockReturnValue(newContents);
+
+    const foo = await updateFile(id, fileName);
+
+    expect(requester).toHaveBeenCalledWith('patch', UPLOAD_URL + id, {
+      params: { uploadType: 'media' },
+      body: newContents,
+      headers: { 'Content-Type': 'text/plain' },
     });
   });
 });

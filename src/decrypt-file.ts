@@ -1,13 +1,14 @@
 import dotenv from 'dotenv';
-import { readFile, writeFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import { EncryptedData, decryptText } from './encrypt';
 import { PRIVATE_FILE } from './var';
+import { getFileContents } from './upload/gdrive';
 
 const decrypt = async () => {
   dotenv.config();
 
-  const contents = await readFile(PRIVATE_FILE + '.redacted', 'utf-8');
-  const encrypted: EncryptedData = JSON.parse(contents);
+  const fileId = process.env['PRIVATE_FILE_ID'] || '';
+  const encrypted: EncryptedData = await getFileContents(fileId);
 
   await writeFile(PRIVATE_FILE + '.tmp', await decryptText(encrypted));
 };
