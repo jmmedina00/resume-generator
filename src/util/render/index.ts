@@ -1,10 +1,7 @@
-import { JSDOM } from 'jsdom';
-
 export const addAtBodyTop = (document: string, snip: string): string => {
-  const dom = new JSDOM(document);
+  const foo = /(.+)?(\<body\>)(.+)?(\<\/body\>)(.+)?/s.exec(document);
+  const [_, ...matches] = foo || [];
 
-  const body = dom.window.document.body;
-  body.insertAdjacentHTML('afterbegin', snip);
-
-  return dom.serialize();
+  matches.splice(2, 0, snip);
+  return matches.join('');
 };
