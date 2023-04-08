@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises';
 import jwt from 'jsonwebtoken';
-import { Requester, getAuthorizedRequester } from '../../net';
-import { authorizeWithBearerToken } from '../../net/auth';
+import { Requester, getAuthorizedRequester } from '../net';
+import { authorizeWithBearerToken } from '../net/auth';
 
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
 

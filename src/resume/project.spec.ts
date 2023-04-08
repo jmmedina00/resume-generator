@@ -3,10 +3,10 @@ import {
   getCoreUserInfo,
   getFileFromRepo,
   getRepoDescription,
-} from '../github';
+} from '../service/github';
 import { RepoProject, getResumeProject } from './project';
 
-jest.mock('../github');
+jest.mock('../service/github');
 
 const basePath = './test/readme/';
 

@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import { writeFile } from 'fs/promises';
-import { EncryptedData, decryptText } from './encrypt';
-import { PRIVATE_FILE } from './var';
-import { getFileContents } from './upload/gdrive';
+import { EncryptedData, decryptText } from './util/encrypt';
+import { PRIVATE_FILE } from './util/var';
+import { getFileContents } from './service/gdrive';
 
 const decrypt = async () => {
   dotenv.config();

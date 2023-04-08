@@ -2,9 +2,9 @@ import { readFile, writeFile } from 'fs/promises';
 import { parse } from 'yaml';
 import { getFlattenedObjectAndLocales } from './mapping/locale';
 import dotenv from 'dotenv';
-import { Renderable, generateFromTemplate } from './render/navbar';
-import { addAtBodyTop } from './render';
-import { prettify } from './prettier';
+import { Renderable, generateFromTemplate } from './util/render/navbar';
+import { addAtBodyTop } from './util/render';
+import { prettify } from './util/prettier';
 
 const main = async () => {
   dotenv.config();

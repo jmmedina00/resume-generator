@@ -1,7 +1,7 @@
-import { getCoreUserInfo } from '../github';
+import { getCoreUserInfo } from '../service/github';
 import { PartialProfiles, Profile, getFullProfiles } from './profile';
 
-jest.mock('../github');
+jest.mock('../service/github');
 
 describe('Profile deflating', () => {
   (getCoreUserInfo as jest.Mock).mockResolvedValue({

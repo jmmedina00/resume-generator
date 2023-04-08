@@ -1,4 +1,4 @@
-import { getCoreUserInfo } from '../github';
+import { getCoreUserInfo } from '../service/github';
 
 export interface Profile {
   network: string;

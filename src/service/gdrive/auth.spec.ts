@@ -1,13 +1,13 @@
 import { readFile } from 'fs/promises';
 import jwt from 'jsonwebtoken';
-import { getAuthorizedRequester } from '../../net';
+import { getAuthorizedRequester } from '../net';
 import { getAuthorizedGoogle } from './auth';
-import { authorizeWithBearerToken } from '../../net/auth';
+import { authorizeWithBearerToken } from '../net/auth';
 
 jest.mock('fs/promises');
 jest.mock('jsonwebtoken');
-jest.mock('../../net');
-jest.mock('../../net/auth');
+jest.mock('../net');
+jest.mock('../net/auth');
 
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
 

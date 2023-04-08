@@ -1,9 +1,9 @@
 import { readFile, writeFile } from 'fs/promises';
 import dotenv from 'dotenv';
-import { encryptText } from './encrypt';
-import { convertToPrettyJSON } from './prettier';
-import { PRIVATE_FILE } from './var';
-import { updateFile } from './upload/gdrive';
+import { encryptText } from './util/encrypt';
+import { convertToPrettyJSON } from './util/prettier';
+import { PRIVATE_FILE } from './util/var';
+import { updateFile } from './service/gdrive';
 
 const encrypt = async () => {
   dotenv.config();

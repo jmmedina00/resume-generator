@@ -3,7 +3,7 @@ import {
   getCoreUserInfo,
   getFileFromRepo,
   getRepoDescription,
-} from '../github';
+} from '../service/github';
 import { marked } from 'marked';
 
 interface Project {
