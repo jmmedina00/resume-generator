@@ -3,13 +3,7 @@ import nock from 'nock';
 
 describe('Web requests', () => {
   it('should be able to do unauthorized request', async () => {
-    nock('http://unauthenticated.local', {
-      reqheaders: { Authorization: /.+/ },
-    })
-      .get('/')
-      .reply(500, { message: 'Bad', code: 3 });
-
-    nock('http://unauthenticated.local')
+    nock('http://unauthenticated.local', { badheaders: ['Authorization'] })
       .get('/')
       .reply(200, { message: 'Unauthorized', code: 3 });
 

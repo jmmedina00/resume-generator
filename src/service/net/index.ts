@@ -22,6 +22,6 @@ export const getAuthorizedRequester =
         url,
         params,
         data: !body || Object.keys(body).length === 0 ? null : body, // Ensure no body gets sent unless properly specified
-        headers: { Authorization: auth(), ...headers },
+        headers: { Authorization: auth() || null, ...headers },
       })
     ).data;
