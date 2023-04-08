@@ -6,8 +6,6 @@ import {
 } from '../github';
 import { marked } from 'marked';
 
-jest.mock('../github');
-
 interface Project {
   name: string;
   type: string;
