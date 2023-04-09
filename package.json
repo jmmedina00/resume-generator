@@ -6,7 +6,7 @@
     "build": "tsc -p .",
     "start": "ts-node src/main.ts",
     "test": "jest",
-    "redact": "ts-node src/decrypt-file.ts && diff -q private.yml private.yml.tmp || ts-node src/encrypt-file.ts "
+    "redact": "ts-node src/decrypt-file.ts && diff -q private.yml private.yml.tmp || ts-node src/encrypt-file.ts"
   },
   "keywords": [
     "resume",
@@ -26,7 +26,7 @@
     "mime-types": "^2.1.35",
     "mustache": "^4.2.0",
     "prettier": "^2.8.7",
-    "resumed": "^3.0.1",
+    "resume-schema": "^1.0.0",
     "yaml": "^2.2.1"
   },
   "devDependencies": {
