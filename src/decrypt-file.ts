@@ -10,7 +10,7 @@ const decrypt = async () => {
   const fileId = process.env['PRIVATE_FILE_ID'] || '';
   const encrypted: EncryptedData = await getFileContents(fileId);
 
-  await writeFile(PRIVATE_FILE + '.tmp', await decryptText(encrypted));
+  await writeFile(PRIVATE_FILE + '.tmp', decryptText(encrypted));
 };
 
 decrypt();
