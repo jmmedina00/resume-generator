@@ -7,7 +7,7 @@ export const patchObject = (
   const entries: Entry[] = Object.entries(flatObject).map(([key, value]) => [
     key,
     value instanceof Object
-      ? patchObject(value, translations[key])
+      ? patchObject(value, translations[key] ?? {})
       : translations[key] ?? value,
   ]);
 

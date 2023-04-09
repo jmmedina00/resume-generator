@@ -114,4 +114,41 @@ describe('Item patching', () => {
     const actual = patchObject(object, translations);
     expect(actual).toEqual(expected);
   });
+
+  it('should not crashing if it finds something there is no translation for', () => {
+    const object = {
+      name: 'Juanmi',
+      address: {
+        street: 'street',
+        city: 'Malaga',
+      },
+      projects: {
+        devJob: {
+          name: 'name',
+          description: 'description',
+          startDate: 'today',
+        },
+        consulting: {
+          name: 'Consulting',
+          endDate: '2021',
+        },
+      },
+    };
+
+    const translations = {
+      address: {
+        street: 'Piruleta',
+      },
+      projects: {
+        devJob: {
+          name: 'Desarrollador web',
+          description: 'Programador',
+        },
+      },
+    };
+
+    expect(() => {
+      patchObject(object, translations);
+    }).not.toThrow();
+  });
 });
