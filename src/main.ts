@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
-import { makeResumes } from './public';
+import { makeResumes } from './resume/gen-public';
 import { promisify } from 'util';
-import { getPrivateVersionGenerator } from './private';
-import { mkdir, writeFile } from 'fs/promises';
-import { prettify } from './util/prettier';
+import { getPrivateVersionGenerator } from './resume/gen-private';
+import { EncryptedData, decryptText } from './util/encrypt';
+import { getFileContents } from './service/gdrive';
+import { parse } from 'yaml';
 
 const schema = require('resume-schema');
 
@@ -19,7 +20,10 @@ const main = async () => {
 
   console.log(await Promise.all(validations));
 
-  const privateGenerator = await getPrivateVersionGenerator();
+  const fileId = process.env['PRIVATE_FILE_ID'] || '';
+  const encrypted: EncryptedData = await getFileContents(fileId);
+  const privateIterations: any[] = parse(decryptText(encrypted));
+  const privateGenerator = await getPrivateVersionGenerator(privateIterations);
 
   const privateResumes = resumes.map<[string, object[]]>(([code, resume]) => [
     code,
