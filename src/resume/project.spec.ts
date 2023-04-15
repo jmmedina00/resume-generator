@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
 import {
-  getCoreUserInfo,
+  GithubUserInfo,
   getFileFromRepo,
   getRepoDescription,
 } from '../service/github';
@@ -11,8 +11,14 @@ jest.mock('../service/github');
 const basePath = './test/readme/';
 
 describe('Project conversion', () => {
+  const gitHubInfo: GithubUserInfo = {
+    user: 'username',
+    fullName: '',
+    profileUrl: '',
+    avatarUrl: '',
+  };
+
   describe('description', () => {
-    (getCoreUserInfo as jest.Mock).mockResolvedValue({ user: 'username' });
     (getFileFromRepo as jest.Mock).mockResolvedValue('');
 
     it('should leave description map as-is when no repo-description is present', async () => {
@@ -28,7 +34,7 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { description } = await getResumeProject(project);
+      const { description } = await getResumeProject(project, gitHubInfo);
       expect(description).toEqual({ en: 'Project', es: 'Proyecto' });
       expect(getRepoDescription).not.toHaveBeenCalled();
     });
@@ -49,7 +55,7 @@ describe('Project conversion', () => {
         'repo-description': 'fr',
       };
 
-      const { description } = await getResumeProject(project);
+      const { description } = await getResumeProject(project, gitHubInfo);
       expect(description).toEqual({
         en: 'Kitty',
         es: 'Gato',
@@ -60,8 +66,6 @@ describe('Project conversion', () => {
   });
 
   describe('name', () => {
-    (getCoreUserInfo as jest.Mock).mockResolvedValue({ user: 'username' });
-
     it('should get replace repo name with repo README first title', async () => {
       const file = 'with-title.md';
 
@@ -81,7 +85,7 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { name } = await getResumeProject(project);
+      const { name } = await getResumeProject(project, gitHubInfo);
       expect(name).toEqual('This is the title');
       expect(getFileFromRepo).toHaveBeenCalledWith('cat', 'README.md');
     });
@@ -105,15 +109,13 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { name } = await getResumeProject(project);
+      const { name } = await getResumeProject(project, gitHubInfo);
       expect(name).toEqual('cat');
       expect(getFileFromRepo).toHaveBeenCalledWith('cat', 'README.md');
     });
   });
 
   describe('keywords', () => {
-    (getCoreUserInfo as jest.Mock).mockResolvedValue({ user: 'username' });
-
     it('should get keywords from README icon block', async () => {
       const file = 'icons.md';
 
@@ -133,7 +135,7 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { keywords } = await getResumeProject(project);
+      const { keywords } = await getResumeProject(project, gitHubInfo);
       expect(keywords).toEqual(['foo', 'bar', 'baz', 'test']);
       expect(getFileFromRepo).toHaveBeenCalledWith('cat', 'README.md');
     });
@@ -157,7 +159,7 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { keywords } = await getResumeProject(project);
+      const { keywords } = await getResumeProject(project, gitHubInfo);
       expect(keywords).toEqual(['le-test', 'whatever', 'baz']);
       expect(getFileFromRepo).toHaveBeenCalledWith('cat', 'README.md');
     });
@@ -181,7 +183,7 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { keywords } = await getResumeProject(project);
+      const { keywords } = await getResumeProject(project, gitHubInfo);
       expect(keywords).toEqual([]);
       expect(getFileFromRepo).toHaveBeenCalledWith('cat', 'README.md');
     });
@@ -205,7 +207,7 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { keywords } = await getResumeProject(project);
+      const { keywords } = await getResumeProject(project, gitHubInfo);
       expect(keywords).toEqual([]);
       expect(getFileFromRepo).toHaveBeenCalledWith('cat', 'README.md');
     });
@@ -213,8 +215,6 @@ describe('Project conversion', () => {
 
   describe('url', () => {
     it('should output URL as repo URL if page is not active', async () => {
-      (getCoreUserInfo as jest.Mock).mockResolvedValue({ user: 'username' });
-
       const project: RepoProject = {
         name: 'dog',
         type: 'application',
@@ -227,13 +227,11 @@ describe('Project conversion', () => {
         'page-active': false,
       };
 
-      const { url } = await getResumeProject(project);
+      const { url } = await getResumeProject(project, gitHubInfo);
       expect(url).toEqual('https://github.com/username/dog');
     });
 
     it('should be GitHub Pages URL if page is active', async () => {
-      (getCoreUserInfo as jest.Mock).mockResolvedValue({ user: 'coder' });
-
       const project: RepoProject = {
         name: 'dog',
         type: 'application',
@@ -246,8 +244,8 @@ describe('Project conversion', () => {
         'page-active': true,
       };
 
-      const { url } = await getResumeProject(project);
-      expect(url).toEqual('https://coder.github.io/dog');
+      const { url } = await getResumeProject(project, gitHubInfo);
+      expect(url).toEqual('https://username.github.io/dog');
     });
   });
 
@@ -271,7 +269,10 @@ describe('Project conversion', () => {
         'page-active': true,
       };
 
-      const { type, startDate, endDate } = await getResumeProject(project);
+      const { type, startDate, endDate } = await getResumeProject(
+        project,
+        gitHubInfo
+      );
       const actual = { type, startDate, endDate };
 
       expect(actual).toEqual(expected);

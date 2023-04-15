@@ -1,12 +1,15 @@
-import { getCoreUserInfo } from '../service/github';
+import { GithubUserInfo } from '../service/github';
 import { PartialProfiles, Profile, getFullProfiles } from './profile';
 
 jest.mock('../service/github');
 
 describe('Profile deflating', () => {
-  (getCoreUserInfo as jest.Mock).mockResolvedValue({
+  const gitHubUser: GithubUserInfo = {
     fullName: 'Pedro Jiménez',
-  });
+    user: '',
+    profileUrl: '',
+    avatarUrl: '',
+  };
 
   it('should not accept any entry that is missing both URL and username', async () => {
     const partials: PartialProfiles = {
@@ -14,7 +17,7 @@ describe('Profile deflating', () => {
       empty: {},
     };
 
-    expect(getFullProfiles(partials)).rejects.toThrow();
+    expect(getFullProfiles(partials, gitHubUser)).rejects.toThrow();
   });
 
   it('should populate network with key as-is', async () => {
@@ -28,9 +31,11 @@ describe('Profile deflating', () => {
       { network: 'bar' },
     ];
 
-    const actual = (await getFullProfiles(partials)).map(({ network }) => ({
-      network,
-    }));
+    const actual = (await getFullProfiles(partials, gitHubUser)).map(
+      ({ network }) => ({
+        network,
+      })
+    );
     expect(actual).toEqual(expected);
   });
 
@@ -39,7 +44,7 @@ describe('Profile deflating', () => {
       foo: { username: 'juanmi', url: 'http://nothing.alike' },
     };
 
-    const actual = (await getFullProfiles(partials)).map(
+    const actual = (await getFullProfiles(partials, gitHubUser)).map(
       ({ network, ...result }) => result
     );
     expect(actual).toEqual([
@@ -58,7 +63,7 @@ describe('Profile deflating', () => {
       { username: 'Pedro Jiménez', url: 'http://test.local' },
     ];
 
-    const actual = (await getFullProfiles(partials)).map(
+    const actual = (await getFullProfiles(partials, gitHubUser)).map(
       ({ network, ...result }) => result
     );
     expect(actual).toEqual(expected);
@@ -77,7 +82,7 @@ describe('Profile deflating', () => {
       { username: 'regexboy', url: 'https://re.com/regexboy' },
     ];
 
-    const actual = (await getFullProfiles(partials)).map(
+    const actual = (await getFullProfiles(partials, gitHubUser)).map(
       ({ network, ...result }) => result
     );
     expect(actual).toEqual(expected);
@@ -94,7 +99,7 @@ describe('Profile deflating', () => {
       { username: 'jmmedina', url: 'https://share.io/jmmedina' },
     ];
 
-    const actual = (await getFullProfiles(partials)).map(
+    const actual = (await getFullProfiles(partials, gitHubUser)).map(
       ({ network, ...result }) => result
     );
     expect(actual).toEqual(expected);
@@ -113,7 +118,7 @@ describe('Profile deflating', () => {
       { username: 'jmmedina', url: 'https://share.io/jmmedina' },
     ];
 
-    const actual = (await getFullProfiles(partials)).map(
+    const actual = (await getFullProfiles(partials, gitHubUser)).map(
       ({ network, ...result }) => result
     );
     expect(actual).toEqual(expected);

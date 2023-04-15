@@ -30,7 +30,7 @@ export const makeResumes = async (path: string) => {
 
   const githubUser = await getCoreUserInfo();
   const { profiles: partialProfiles } = incompleteBasics;
-  const profiles = await getFullProfiles(partialProfiles);
+  const profiles = await getFullProfiles(partialProfiles, githubUser);
 
   const basics = {
     name: githubUser.fullName,
@@ -49,7 +49,7 @@ export const makeResumes = async (path: string) => {
   const projects = await Promise.all(
     Object.entries(keyedProjects as object)
       .map(([name, info]) => ({ name, ...info }))
-      .map((repoProject) => getResumeProject(repoProject))
+      .map((repoProject) => getResumeProject(repoProject, githubUser))
   );
 
   const localised = getFlattenedObjectAndLocales({

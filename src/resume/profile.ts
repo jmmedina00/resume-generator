@@ -1,4 +1,4 @@
-import { getCoreUserInfo } from '../service/github';
+import { GithubUserInfo } from '../service/github';
 
 export interface Profile {
   network: string;
@@ -11,7 +11,8 @@ export interface PartialProfiles {
 }
 
 export const getFullProfiles = async (
-  profiles: PartialProfiles
+  profiles: PartialProfiles,
+  { fullName }: GithubUserInfo
 ): Promise<Profile[]> => {
   const entries = Object.entries(profiles);
 
@@ -20,8 +21,6 @@ export const getFullProfiles = async (
       new Error('All profile partials must at least have some reference')
     );
   }
-
-  const { fullName } = await getCoreUserInfo();
 
   return entries.map(([key, { username, url }]) => ({
     network: key,

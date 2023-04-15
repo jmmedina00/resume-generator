@@ -1,6 +1,6 @@
 import { LanguageCode } from 'iso-639-1';
 import {
-  getCoreUserInfo,
+  GithubUserInfo,
   getFileFromRepo,
   getRepoDescription,
 } from '../service/github';
@@ -61,13 +61,16 @@ const getFirstTitle = (tokens: marked.TokensList) => {
   return heading?.text;
 };
 
-export const getResumeProject = async ({
-  name: repoName,
-  'repo-description': languageFromRepo,
-  'page-active': isGitHubPage,
-  description: baseDescription,
-  ...project
-}: RepoProject): Promise<ResumeProject> => {
+export const getResumeProject = async (
+  {
+    name: repoName,
+    'repo-description': languageFromRepo,
+    'page-active': isGitHubPage,
+    description: baseDescription,
+    ...project
+  }: RepoProject,
+  { user }: GithubUserInfo
+): Promise<ResumeProject> => {
   const description = languageFromRepo
     ? {
         ...baseDescription,
@@ -81,7 +84,7 @@ export const getResumeProject = async ({
 
   const title = getFirstTitle(readmeTokens);
 
-  const { user } = await getCoreUserInfo();
+  //const { user } = await getCoreUserInfo();
 
   return {
     ...project,
