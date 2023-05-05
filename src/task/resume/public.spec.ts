@@ -1,20 +1,20 @@
-import { getFlattenedObjectAndLocales } from '../mapping/locale';
-import { LocalisedObject } from '../mapping/locale.types';
+import { getFlattenedObjectAndLocales } from '../../mapping/locale';
+import { LocalisedObject } from '../../mapping/locale.types';
 import {
   addGitHubInfoToBasics,
   getDekeyedSectionFromObject,
   getTranslated,
-} from '../resume/gen-public';
-import { ResumeContext, initialContext } from './context';
+} from '../../resume/gen-public';
+import { ResumeContext, initialContext } from '../context';
 import {
   transformAndReplaceLocalisedField,
   transformCompleteToLocalised,
   transformIncompleteField,
   transformLocalisedToTranslated,
-} from './transform';
+} from './public';
 
-jest.mock('../resume/gen-public'); // Just check types fit target functions
-jest.mock('../mapping/locale');
+jest.mock('../../resume/gen-public'); // Just check types fit target functions
+jest.mock('../../mapping/locale');
 
 describe('Transforming tasks', () => {
   it('should transform incomplete field and append them to complete section', async () => {

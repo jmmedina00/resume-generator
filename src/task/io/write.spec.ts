@@ -1,5 +1,5 @@
 import { writeFile } from 'fs/promises';
-import { ResumeContext, initialContext } from './context';
+import { ResumeContext, initialContext } from '../context';
 import { writeToFile } from './write';
 
 jest.mock('fs/promises');

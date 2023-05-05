@@ -1,5 +1,5 @@
 import { writeFile } from 'fs/promises';
-import { ResumeContext } from './context';
+import { ResumeContext } from '../context';
 
 export type FileWriter = (
   path: string,

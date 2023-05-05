@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises';
-import { GithubUserInfo, getCoreUserInfo } from '../service/github';
-import { ResumeContext, initialContext } from './context';
+import { GithubUserInfo, getCoreUserInfo } from '../../service/github';
+import { ResumeContext, initialContext } from '../context';
 import {
   SRC_RESUME_PATH,
   readGitHub,
@@ -8,13 +8,13 @@ import {
   readSourceResume,
 } from './read';
 import { parse } from 'yaml';
-import { getFileContents } from '../service/gdrive';
-import { EncryptedData, decryptText } from '../util/encrypt';
+import { getFileContents } from '../../service/gdrive';
+import { EncryptedData, decryptText } from '../../util/encrypt';
 
 jest.mock('fs/promises');
-jest.mock('../service/github');
-jest.mock('../service/gdrive');
-jest.mock('../util/encrypt');
+jest.mock('../../service/github');
+jest.mock('../../service/gdrive');
+jest.mock('../../util/encrypt');
 jest.mock('yaml');
 
 describe('Reading tasks', () => {

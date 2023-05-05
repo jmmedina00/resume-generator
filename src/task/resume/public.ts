@@ -1,10 +1,10 @@
-import { getFlattenedObjectAndLocales } from '../mapping/locale';
+import { getFlattenedObjectAndLocales } from '../../mapping/locale';
 import {
   getDekeyedSectionFromObject,
   getTranslated,
-} from '../resume/gen-public';
-import { GithubUserInfo } from '../service/github';
-import { ResumeContext } from './context';
+} from '../../resume/gen-public';
+import { GithubUserInfo } from '../../service/github';
+import { ResumeContext } from '../context';
 
 export const transformIncompleteField =
   (

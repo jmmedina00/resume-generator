@@ -1,9 +1,9 @@
 import { readFile } from 'fs/promises';
-import { getCoreUserInfo } from '../service/github';
-import { ResumeContext } from './context';
+import { getCoreUserInfo } from '../../service/github';
+import { ResumeContext } from '../context';
 import { parse } from 'yaml';
-import { EncryptedData, decryptText } from '../util/encrypt';
-import { getFileContents } from '../service/gdrive';
+import { EncryptedData, decryptText } from '../../util/encrypt';
+import { getFileContents } from '../../service/gdrive';
 
 export const SRC_RESUME_PATH = './resume.yml';
 
