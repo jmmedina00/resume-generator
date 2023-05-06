@@ -5,11 +5,15 @@ import { getPrivateVersionGenerator } from './resume/gen-private';
 import { EncryptedData, decryptText } from './util/encrypt';
 import { getFileContents } from './service/gdrive';
 import { parse } from 'yaml';
+import { tasks } from './task';
 
 const schema = require('resume-schema');
 
 const main = async () => {
   dotenv.config();
+  await tasks.run();
+
+  return;
   const validate = promisify(schema.validate);
 
   const resumes = await makeResumes('./resume.yml');
