@@ -6,43 +6,41 @@ import { writeToFile } from './io/write';
 export const PUBLIC_DIST = './public';
 export const PRIVATE_DIST = './private';
 
-export const exportPublicVersions = (
-  ctx: ResumeContext,
-  task: ListrTaskWrapper<ResumeContext, any>
-): Listr<ResumeContext> => {
-  const publicVersions = Object.keys(ctx.publicVersions);
+export interface FileDescriptor {
+  path: string;
+  fn: (ctx: ResumeContext) => any;
+}
 
-  const writer = (version: string) => {
-    const filename = `${version}.json`;
-    const path = format({ base: filename, dir: PUBLIC_DIST });
-    const fn = ({ publicVersions }: ResumeContext) =>
-      JSON.stringify(publicVersions[version]);
+export const getPublicVersionDescriptors = ({
+  publicVersions,
+}: ResumeContext): FileDescriptor[] =>
+  Object.keys(publicVersions).map((version) => ({
+    path: format({ base: `${version}.json`, dir: PUBLIC_DIST }),
+    fn: (ctx) => JSON.stringify(ctx.publicVersions[version]),
+  }));
 
-    return {
-      title: `Save ${filename}`,
-      task: writeToFile(path, fn),
-    };
-  };
+export const getPrivateVersionDescriptors = ({
+  privateVersions,
+}: ResumeContext): FileDescriptor[] =>
+  Object.keys(privateVersions)
+    .flatMap((code) =>
+      privateVersions[code].map((_, index) => ({ code, index }))
+    )
+    .map(({ code, index }) => ({
+      path: format({ base: `${code}-${index}.json`, dir: PRIVATE_DIST }),
+      fn: (ctx) => JSON.stringify(ctx.privateVersions[code][index]),
+    }));
 
-  return task.newListr(publicVersions.map(writer));
-};
-
-export const exportPrivateVersions = (
-  ctx: ResumeContext,
-  task: ListrTaskWrapper<ResumeContext, any>
-): Listr<ResumeContext> => {
-  const privateVersions = Object.keys(ctx.privateVersions).flatMap((code) =>
-    ctx.privateVersions[code].map((_, index) => ({ code, index }))
-  );
-
-  const tasks = privateVersions.map(({ code, index }) => {
-    const filename = `${code}-${index}.json`;
-    const path = format({ base: filename, dir: PRIVATE_DIST });
-    const fn = ({ privateVersions }: ResumeContext) =>
-      JSON.stringify(privateVersions[code][index]);
-
-    return { title: `Save ${filename}`, task: writeToFile(path, fn) };
-  });
-
-  return task.newListr(tasks);
-};
+export const getExportTasksFromDescriptors =
+  (descriptors: FileDescriptor[]) =>
+  (
+    ctx: ResumeContext,
+    task: ListrTaskWrapper<ResumeContext, any>
+  ): Listr<ResumeContext> =>
+    task.newListr(
+      descriptors.map(({ path, fn }) => ({
+        title: `Save ${path}`,
+        task: writeToFile(path, fn),
+      })),
+      { concurrent: true }
+    );

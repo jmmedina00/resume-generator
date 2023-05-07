@@ -9,7 +9,11 @@ import {
 } from './resume/public';
 import { addGitHubInfoToBasics, getProperProjects } from '../resume/gen-public';
 import { generatePrivateVersions } from './resume/private';
-import { exportPrivateVersions, exportPublicVersions } from './export';
+import {
+  getExportTasksFromDescriptors,
+  getPrivateVersionDescriptors,
+  getPublicVersionDescriptors,
+} from './export';
 
 export const tasks = new Listr<ResumeContext>(
   [
@@ -69,14 +73,11 @@ export const tasks = new Listr<ResumeContext>(
     },
     {
       title: 'Export resume versions',
-      task: (_, exportTask) =>
-        exportTask.newListr(
-          [
-            { title: 'Public versions', task: exportPublicVersions },
-            { title: 'Private versions', task: exportPrivateVersions },
-          ],
-          { concurrent: true }
-        ),
+      task: (ctx, task) =>
+        getExportTasksFromDescriptors([
+          ...getPublicVersionDescriptors(ctx),
+          ...getPrivateVersionDescriptors(ctx),
+        ])(ctx, task),
     },
   ],
   { collectErrors: 'minimal', rendererOptions: { collapseSubtasks: false } }
