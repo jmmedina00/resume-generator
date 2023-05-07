@@ -1,3 +1,4 @@
+import { Options } from 'prettier';
 import { LocalisedObject } from '../mapping/locale.types';
 import { GithubUserInfo } from '../service/github';
 
@@ -19,6 +20,14 @@ export interface ResumeContext {
   privateIterations: any[];
   privateVersions: LocalisedIterations;
   publicVersions: LocalisedVersions;
+}
+
+export interface RenderContext {
+  path: string;
+  contents: string;
+
+  prettierOptions: Options;
+  validateFn: (foo: any) => Promise<any>;
 }
 
 export const initialContext: ResumeContext = {
