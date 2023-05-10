@@ -1,6 +1,6 @@
 import { Options, resolveConfig } from 'prettier';
 import { RenderContext } from '../context';
-import { getResumeRenderConfig } from './render-config';
+import { getResumeRenderConfig } from './config';
 
 jest.mock('prettier');
 jest.mock('resume-schema', () => ({
