@@ -1,7 +1,7 @@
 import { Listr, ListrTaskWrapper } from 'listr2';
-import { ResumeContext } from './context';
+import { RenderContext, ResumeContext } from './context';
 import { format } from 'path';
-import { writeToFile } from './io/write';
+import { getFileDescriptorRenderingTasks } from './render';
 
 export const PUBLIC_DIST = './public';
 export const PRIVATE_DIST = './private';
@@ -31,16 +31,24 @@ export const getPrivateVersionDescriptors = ({
       fn: (ctx) => JSON.stringify(ctx.privateVersions[code][index]),
     }));
 
-export const getExportTasksFromDescriptors =
-  (descriptors: FileDescriptor[]) =>
+export const getExportTasksFromDescriptor =
+  (
+    { path, fn }: FileDescriptor,
+    {
+      prettierOptions = {},
+      validateFn = async () => {},
+    }: Partial<RenderContext>
+  ) =>
   (
     ctx: ResumeContext,
     task: ListrTaskWrapper<ResumeContext, any>
-  ): Listr<ResumeContext> =>
-    task.newListr(
-      descriptors.map(({ path, fn }) => ({
-        title: `Save ${path}`,
-        task: writeToFile(path, fn),
-      })),
-      { concurrent: true }
-    );
+  ): Listr<RenderContext> => {
+    const context: RenderContext = {
+      path,
+      contents: fn(ctx),
+      prettierOptions,
+      validateFn,
+    };
+
+    return getFileDescriptorRenderingTasks(context)(ctx, task);
+  };

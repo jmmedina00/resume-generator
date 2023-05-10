@@ -10,10 +10,11 @@ import {
 import { addGitHubInfoToBasics, getProperProjects } from '../resume/gen-public';
 import { generatePrivateVersions } from './resume/private';
 import {
-  getExportTasksFromDescriptors,
+  getExportTasksFromDescriptor,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './export';
+import { getResumeRenderConfig } from './resume/render-config';
 
 export const tasks = new Listr<ResumeContext>(
   [
@@ -73,11 +74,21 @@ export const tasks = new Listr<ResumeContext>(
     },
     {
       title: 'Export resume versions',
-      task: (ctx, task) =>
-        getExportTasksFromDescriptors([
+      task: async (ctx, task) => {
+        const descriptors = [
           ...getPublicVersionDescriptors(ctx),
           ...getPrivateVersionDescriptors(ctx),
-        ])(ctx, task),
+        ];
+
+        const partialRenderContext = await getResumeRenderConfig();
+
+        const tasks = descriptors.map((descriptor) => ({
+          title: descriptor.path,
+          task: getExportTasksFromDescriptor(descriptor, partialRenderContext),
+        }));
+
+        return task.newListr(tasks);
+      }, // TODO move this to a proper file
     },
   ],
   { collectErrors: 'minimal', rendererOptions: { collapseSubtasks: false } }

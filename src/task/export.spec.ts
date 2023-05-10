@@ -1,23 +1,19 @@
-import { ListrTask, ListrTaskWrapper } from 'listr2';
-import { ResumeContext, initialContext } from './context';
+import { ListrTaskWrapper } from 'listr2';
+import { RenderContext, ResumeContext, initialContext } from './context';
 import {
   FileDescriptor,
   PRIVATE_DIST,
   PUBLIC_DIST,
-  getExportTasksFromDescriptors,
+  getExportTasksFromDescriptor,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './export';
-import { writeToFile } from './io/write';
 import { format } from 'path';
+import { getFileDescriptorRenderingTasks } from './render';
 
-jest.mock('./io/write');
+jest.mock('./render');
 
 describe('Exporting tasks', () => {
-  beforeEach(() => {
-    (writeToFile as jest.Mock).mockReset().mockReturnValue(jest.fn());
-  });
-
   it('should generate descriptors for all public versions', () => {
     const context: ResumeContext = {
       ...initialContext,
@@ -84,52 +80,47 @@ describe('Exporting tasks', () => {
     expect(actual).toEqual(expected);
   });
 
-  it('should create writing tasks according to descriptors provided', () => {
+  it('should create writing tasks from rendering, file descriptor and provided precontext options', async () => {
     const lister = jest.fn();
     const providedTask: Partial<ListrTaskWrapper<ResumeContext, any>> = {
       newListr: lister,
     };
 
-    const foo = jest.fn();
-    const bar = jest.fn();
-    const baz = jest.fn();
+    const foo = jest.fn().mockReturnValue('foobarbaz');
+    const bar = jest.fn().mockResolvedValue('barbaz');
 
-    const descriptors: FileDescriptor[] = [
-      {
-        path: 'qwe/foo',
-        fn: foo,
-      },
-      {
-        path: 'asd/zxc/bar',
-        fn: bar,
-      },
-      {
-        path: 'iopbaz',
-        fn: baz,
-      },
-    ];
+    const taskGenerator = jest.fn();
+    (getFileDescriptorRenderingTasks as jest.Mock).mockReturnValue(
+      taskGenerator
+    );
 
-    const expectedTitles = ['Save qwe/foo', 'Save asd/zxc/bar', 'Save iopbaz'];
+    const descriptor: FileDescriptor = {
+      path: 'qwe/foo',
+      fn: foo,
+    };
 
-    getExportTasksFromDescriptors(descriptors)(
+    const partialRenderContext: Partial<RenderContext> = {
+      prettierOptions: { tabWidth: 4 },
+      validateFn: bar,
+    };
+
+    const context: ResumeContext = { ...initialContext };
+
+    (await getExportTasksFromDescriptor(descriptor, partialRenderContext))(
       { ...initialContext },
       providedTask as ListrTaskWrapper<ResumeContext, any>
     );
 
-    const taskDescriptions = lister.mock.calls[0][0] as ListrTask<
-      ResumeContext,
-      any
-    >[];
+    const expectedRenderContext: RenderContext = {
+      path: 'qwe/foo',
+      contents: 'foobarbaz',
+      prettierOptions: { tabWidth: 4 },
+      validateFn: bar,
+    };
 
-    const titles = taskDescriptions.map(({ title }) => title || '');
-    expect(titles).toEqual(expectedTitles);
-
-    const expectedCalls = [
-      ['qwe/foo', foo],
-      ['asd/zxc/bar', bar],
-      ['iopbaz', baz],
-    ];
-
-    expect((writeToFile as jest.Mock).mock.calls).toEqual(expectedCalls);
+    const actualRenderContext = (getFileDescriptorRenderingTasks as jest.Mock)
+      .mock.calls[0][0];
+    expect(actualRenderContext).toEqual(expectedRenderContext);
+    expect(taskGenerator).toHaveBeenCalledWith(context, providedTask);
   });
 });
