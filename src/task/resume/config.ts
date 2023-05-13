@@ -4,11 +4,13 @@ import { promisify } from 'util';
 
 const schema = require('resume-schema');
 
-export const getResumeRenderConfig = async (): Promise<
-  Partial<RenderContext>
-> => {
-  const prettierOptions: Options = (await resolveConfig('.prettierrc')) || {};
-  const validateFn: (foo: any) => Promise<any> = promisify(schema.validate);
+export const getPrettierOptions = async (): Promise<Options> =>
+  (await resolveConfig('.prettierrc')) || {};
 
-  return { prettierOptions, validateFn };
+export const validateResumeWithSchema = async ({
+  contents,
+}: RenderContext): Promise<void> => {
+  const validator = promisify(schema.validate);
+  const resume = JSON.parse(contents);
+  await validator(resume);
 };

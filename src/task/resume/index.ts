@@ -1,11 +1,11 @@
 import { Listr, ListrTaskWrapper } from 'listr2';
-import { ResumeContext } from '../context';
+import { RenderContext, ResumeContext } from '../context';
 import {
   getExportTasksFromDescriptor,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from '../export';
-import { getResumeRenderConfig } from './config';
+import { getPrettierOptions, validateResumeWithSchema } from './config';
 import {
   transformAndReplaceLocalisedField,
   transformCompleteToLocalised,
@@ -67,7 +67,11 @@ export const getExportTasksForAllResumeVersions = async (
     ...getPrivateVersionDescriptors(ctx),
   ];
 
-  const partialRenderContext = await getResumeRenderConfig();
+  const prettierOptions = await getPrettierOptions();
+  const partialRenderContext: Partial<RenderContext> = {
+    prettierOptions,
+    preprocessFn: validateResumeWithSchema,
+  };
 
   const tasks = descriptors.map((descriptor) => ({
     title: descriptor.path,

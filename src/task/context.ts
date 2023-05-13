@@ -27,7 +27,7 @@ export interface RenderContext {
   contents: string;
 
   prettierOptions: Options;
-  validateFn: (foo: any) => Promise<any>;
+  preprocessFn: (foo: any) => Promise<any>;
 }
 
 export const initialContext: ResumeContext = {

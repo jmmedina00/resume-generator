@@ -24,7 +24,7 @@ import {
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from '../export';
-import { getResumeRenderConfig } from './config';
+import { getPrettierOptions, validateResumeWithSchema } from './config';
 import { Options } from 'prettier';
 
 jest.mock('./public');
@@ -92,7 +92,6 @@ describe('Resume index', () => {
   });
 
   it('should consolidate descriptors and config into list of export tasks', async () => {
-    const validateFn = jest.fn();
     const prettierOptions: Options = { singleQuote: false, printWidth: 7 };
 
     const lister = jest.fn();
@@ -107,10 +106,7 @@ describe('Resume index', () => {
     (getPrivateVersionDescriptors as jest.Mock).mockReturnValue([
       { path: 'private/bar', fn: jest.fn().mockReturnValue('bar') },
     ]);
-    (getResumeRenderConfig as jest.Mock).mockResolvedValue({
-      validateFn,
-      prettierOptions,
-    });
+    (getPrettierOptions as jest.Mock).mockResolvedValue(prettierOptions);
     (getExportTasksFromDescriptor as jest.Mock).mockImplementation(
       ({ path, fn }: FileDescriptor, context: object) => ({
         path,
@@ -125,7 +121,7 @@ describe('Resume index', () => {
         task: {
           path: 'test/public',
           content: 'public',
-          validateFn,
+          preprocessFn: validateResumeWithSchema,
           prettierOptions,
         },
       },
@@ -134,7 +130,7 @@ describe('Resume index', () => {
         task: {
           path: 'public/foo',
           content: 'foo',
-          validateFn,
+          preprocessFn: validateResumeWithSchema,
           prettierOptions,
         },
       },
@@ -143,7 +139,7 @@ describe('Resume index', () => {
         task: {
           path: 'private/bar',
           content: 'bar',
-          validateFn,
+          preprocessFn: validateResumeWithSchema,
           prettierOptions,
         },
       },

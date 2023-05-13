@@ -1,7 +1,7 @@
 import { Listr, ListrTaskWrapper } from 'listr2';
 import { RenderContext, ResumeContext } from './context';
 import { format } from 'path';
-import { getFileDescriptorRenderingTasks } from './render';
+import { getRenderingTasks } from './render';
 
 export const PUBLIC_DIST = './public';
 export const PRIVATE_DIST = './private';
@@ -36,7 +36,7 @@ export const getExportTasksFromDescriptor =
     { path, fn }: FileDescriptor,
     {
       prettierOptions = {},
-      validateFn = async () => {},
+      preprocessFn = async () => {},
     }: Partial<RenderContext>
   ) =>
   (
@@ -47,8 +47,8 @@ export const getExportTasksFromDescriptor =
       path,
       contents: fn(ctx),
       prettierOptions,
-      validateFn,
+      preprocessFn,
     };
 
-    return getFileDescriptorRenderingTasks(context)(ctx, task);
+    return getRenderingTasks(context)(ctx, task);
   };

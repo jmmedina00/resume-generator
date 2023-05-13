@@ -9,7 +9,7 @@ import {
   getPublicVersionDescriptors,
 } from './export';
 import { format } from 'path';
-import { getFileDescriptorRenderingTasks } from './render';
+import { getRenderingTasks } from './render';
 
 jest.mock('./render');
 
@@ -90,9 +90,7 @@ describe('Exporting tasks', () => {
     const bar = jest.fn().mockResolvedValue('barbaz');
 
     const taskGenerator = jest.fn();
-    (getFileDescriptorRenderingTasks as jest.Mock).mockReturnValue(
-      taskGenerator
-    );
+    (getRenderingTasks as jest.Mock).mockReturnValue(taskGenerator);
 
     const descriptor: FileDescriptor = {
       path: 'qwe/foo',
@@ -101,7 +99,7 @@ describe('Exporting tasks', () => {
 
     const partialRenderContext: Partial<RenderContext> = {
       prettierOptions: { tabWidth: 4 },
-      validateFn: bar,
+      preprocessFn: bar,
     };
 
     const context: ResumeContext = { ...initialContext };
@@ -115,11 +113,11 @@ describe('Exporting tasks', () => {
       path: 'qwe/foo',
       contents: 'foobarbaz',
       prettierOptions: { tabWidth: 4 },
-      validateFn: bar,
+      preprocessFn: bar,
     };
 
-    const actualRenderContext = (getFileDescriptorRenderingTasks as jest.Mock)
-      .mock.calls[0][0];
+    const actualRenderContext = (getRenderingTasks as jest.Mock).mock
+      .calls[0][0];
     expect(actualRenderContext).toEqual(expectedRenderContext);
     expect(taskGenerator).toHaveBeenCalledWith(context, providedTask);
   });

@@ -13,7 +13,7 @@ describe('Rendering wrapper tasks', () => {
       path: 'foo/bar',
       contents: 'why dis not work on its own',
       prettierOptions: {},
-      validateFn: jest.fn(),
+      preprocessFn: jest.fn(),
     };
 
     await writeContextToFile(context);

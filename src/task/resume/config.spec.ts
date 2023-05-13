@@ -1,6 +1,6 @@
 import { Options, resolveConfig } from 'prettier';
 import { RenderContext } from '../context';
-import { getResumeRenderConfig } from './config';
+import { getPrettierOptions, validateResumeWithSchema } from './config';
 
 jest.mock('prettier');
 jest.mock('resume-schema', () => ({
@@ -13,19 +13,30 @@ jest.mock('resume-schema', () => ({
 }));
 
 describe('Resume rendering config', () => {
-  it('should provide Prettier options and resume schema validator', async () => {
+  it('should provide Prettier options from lib as-is', async () => {
     const options: Options = { trailingComma: 'es5' };
     (resolveConfig as unknown as jest.Mock).mockResolvedValue(options);
 
-    const { prettierOptions, validateFn } =
-      (await getResumeRenderConfig()) as RenderContext;
+    const actualOptions = await getPrettierOptions();
+    expect(actualOptions).toEqual(options);
+  });
 
-    const validationResult = await validateFn('foobarbaz');
-    expect(prettierOptions).toEqual(options);
-    expect(validationResult).toEqual('foobarbaz is valid');
+  it('should parse resume and validate it against schema', async () => {
+    const object = { foo: 'nar', bar: 'baz' };
 
-    expect(resolveConfig as unknown as jest.Mock).toHaveBeenCalledWith(
-      '.prettierrc'
+    const context: RenderContext = {
+      path: 'foo/bar',
+      contents: JSON.stringify(object),
+      prettierOptions: {},
+      preprocessFn: jest.fn(),
+    };
+
+    await validateResumeWithSchema(context);
+
+    const schema = require('resume-schema');
+    expect(schema.validate).toHaveBeenCalledWith(
+      { ...object },
+      expect.anything()
     );
   });
 });

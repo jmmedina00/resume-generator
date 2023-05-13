@@ -12,7 +12,7 @@ describe('Prettify tasks', () => {
     const context: RenderContext = {
       path: 'foo/bar',
       contents: "{'test': 12, 'foo':'bar'}",
-      validateFn,
+      preprocessFn: validateFn,
       prettierOptions: { endOfLine: 'auto', quoteProps: 'as-needed' },
     };
 
