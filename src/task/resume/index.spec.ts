@@ -18,18 +18,19 @@ import {
   addGitHubInfoToBasics,
   getProperProjects,
 } from '../../resume/gen-public';
+import { getExportTasksFromDescriptor } from '../export';
+import { getPrettierOptions, validateResumeWithSchema } from './export/config';
+import { Options } from 'prettier';
 import {
-  FileDescriptor,
-  getExportTasksFromDescriptor,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
-} from '../export';
-import { getPrettierOptions, validateResumeWithSchema } from './config';
-import { Options } from 'prettier';
+} from './export/descriptor';
+import { FileDescriptor } from '../describe';
 
 jest.mock('./public');
-jest.mock('./config');
+jest.mock('./export/config');
 jest.mock('../export');
+jest.mock('./export/descriptor');
 
 describe('Resume index', () => {
   it('should produce public resume creation tasks', () => {
@@ -100,45 +101,67 @@ describe('Resume index', () => {
     };
 
     (getPublicVersionDescriptors as jest.Mock).mockReturnValue([
-      { path: 'test/public', fn: jest.fn().mockReturnValue('public') },
-      { path: 'public/foo', fn: jest.fn().mockReturnValue('foo') },
+      {
+        dir: 'public',
+        name: 'foo',
+        subversion: 'le',
+        contents: 'bar',
+        wantedFormats: ['excel', 'word'],
+      },
+      {
+        dir: 'publica',
+        name: 'bar',
+        contents: 'baz',
+        wantedFormats: ['web', 'was'],
+      },
     ]);
     (getPrivateVersionDescriptors as jest.Mock).mockReturnValue([
-      { path: 'private/bar', fn: jest.fn().mockReturnValue('bar') },
+      {
+        dir: 'private',
+        name: 'foo',
+        contents: 'bar',
+        wantedFormats: ['java', 'js'],
+      },
     ]);
     (getPrettierOptions as jest.Mock).mockResolvedValue(prettierOptions);
     (getExportTasksFromDescriptor as jest.Mock).mockImplementation(
-      ({ path, fn }: FileDescriptor, context: object) => ({
-        path,
-        content: fn({} as ResumeContext),
+      (descriptor: FileDescriptor, context: object) => ({
+        ...descriptor,
         ...context,
       })
     );
 
     const expectedTasks = [
       {
-        title: 'test/public',
+        title: 'foo-le',
         task: {
-          path: 'test/public',
-          content: 'public',
+          dir: 'public',
+          name: 'foo',
+          subversion: 'le',
+          contents: 'bar',
+          wantedFormats: ['excel', 'word'],
           preprocessFn: validateResumeWithSchema,
           prettierOptions,
         },
       },
       {
-        title: 'public/foo',
+        title: 'bar',
         task: {
-          path: 'public/foo',
-          content: 'foo',
+          dir: 'publica',
+          name: 'bar',
+          contents: 'baz',
+          wantedFormats: ['web', 'was'],
           preprocessFn: validateResumeWithSchema,
           prettierOptions,
         },
       },
       {
-        title: 'private/bar',
+        title: 'foo',
         task: {
-          path: 'private/bar',
-          content: 'bar',
+          dir: 'private',
+          name: 'foo',
+          contents: 'bar',
+          wantedFormats: ['java', 'js'],
           preprocessFn: validateResumeWithSchema,
           prettierOptions,
         },

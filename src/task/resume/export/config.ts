@@ -1,5 +1,5 @@
 import { Options, resolveConfig } from 'prettier';
-import { RenderContext } from '../context';
+import { RenderContext } from '../../context';
 import { promisify } from 'util';
 
 const schema = require('resume-schema');

@@ -1,5 +1,5 @@
 import { Options, resolveConfig } from 'prettier';
-import { RenderContext } from '../context';
+import { RenderContext } from '../../context';
 import { getPrettierOptions, validateResumeWithSchema } from './config';
 
 jest.mock('prettier');

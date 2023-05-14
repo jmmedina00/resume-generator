@@ -1,11 +1,7 @@
 import { Listr, ListrTaskWrapper } from 'listr2';
 import { RenderContext, ResumeContext } from '../context';
-import {
-  getExportTasksFromDescriptor,
-  getPrivateVersionDescriptors,
-  getPublicVersionDescriptors,
-} from '../export';
-import { getPrettierOptions, validateResumeWithSchema } from './config';
+import { getExportTasksFromDescriptor } from '../export';
+import { getPrettierOptions, validateResumeWithSchema } from './export/config';
 import {
   transformAndReplaceLocalisedField,
   transformCompleteToLocalised,
@@ -16,6 +12,10 @@ import {
   addGitHubInfoToBasics,
   getProperProjects,
 } from '../../resume/gen-public';
+import {
+  getPrivateVersionDescriptors,
+  getPublicVersionDescriptors,
+} from './export/descriptor';
 
 export const TASK_COMPLETE_BASICS = 'Complete basics';
 export const TASK_COMPLETE_PROJECTS = 'Complete projects';
@@ -74,7 +74,9 @@ export const getExportTasksForAllResumeVersions = async (
   };
 
   const tasks = descriptors.map((descriptor) => ({
-    title: descriptor.path,
+    title: [descriptor.name, descriptor.subversion]
+      .filter((foo) => !!foo)
+      .join('-'),
     task: getExportTasksFromDescriptor(descriptor, partialRenderContext),
   }));
 
