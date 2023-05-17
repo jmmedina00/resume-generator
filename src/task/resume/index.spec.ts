@@ -18,7 +18,10 @@ import {
   addGitHubInfoToBasics,
   getProperProjects,
 } from '../../resume/gen-public';
-import { getExportTasksFromDescriptor } from '../export';
+import {
+  RenderContextTemplates,
+  getExportTasksFromDescriptor,
+} from '../export';
 import { getPrettierOptions, validateResumeWithSchema } from './export/config';
 import { Options } from 'prettier';
 import {
@@ -106,13 +109,11 @@ describe('Resume index', () => {
         name: 'foo',
         subversion: 'le',
         contents: 'bar',
-        wantedFormats: ['excel', 'word'],
       },
       {
         dir: 'publica',
         name: 'bar',
         contents: 'baz',
-        wantedFormats: ['web', 'was'],
       },
     ]);
     (getPrivateVersionDescriptors as jest.Mock).mockReturnValue([
@@ -120,14 +121,18 @@ describe('Resume index', () => {
         dir: 'private',
         name: 'foo',
         contents: 'bar',
-        wantedFormats: ['java', 'js'],
       },
     ]);
     (getPrettierOptions as jest.Mock).mockResolvedValue(prettierOptions);
     (getExportTasksFromDescriptor as jest.Mock).mockImplementation(
-      (descriptor: FileDescriptor, context: object) => ({
+      (
+        descriptor: FileDescriptor,
+        templates: RenderContextTemplates,
+        validateFn: Function
+      ) => ({
+        templates,
+        validateFn,
         ...descriptor,
-        ...context,
       })
     );
 
@@ -135,35 +140,47 @@ describe('Resume index', () => {
       {
         title: 'foo-le',
         task: {
+          validateFn: validateResumeWithSchema,
+          templates: {
+            json: {
+              prettierOptions,
+              preprocessFn: expect.anything(),
+            },
+          },
           dir: 'public',
           name: 'foo',
           subversion: 'le',
           contents: 'bar',
-          wantedFormats: ['excel', 'word'],
-          preprocessFn: validateResumeWithSchema,
-          prettierOptions,
         },
       },
       {
         title: 'bar',
         task: {
+          validateFn: validateResumeWithSchema,
+          templates: {
+            json: {
+              prettierOptions,
+              preprocessFn: expect.anything(),
+            },
+          },
           dir: 'publica',
           name: 'bar',
           contents: 'baz',
-          wantedFormats: ['web', 'was'],
-          preprocessFn: validateResumeWithSchema,
-          prettierOptions,
         },
       },
       {
         title: 'foo',
         task: {
+          validateFn: validateResumeWithSchema,
+          templates: {
+            json: {
+              prettierOptions,
+              preprocessFn: expect.anything(),
+            },
+          },
           dir: 'private',
           name: 'foo',
           contents: 'bar',
-          wantedFormats: ['java', 'js'],
-          preprocessFn: validateResumeWithSchema,
-          prettierOptions,
         },
       },
     ];

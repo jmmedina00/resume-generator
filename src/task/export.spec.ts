@@ -1,53 +1,117 @@
-import { ListrTaskWrapper } from 'listr2';
+import { ListrTask, ListrTaskWrapper } from 'listr2';
 import { RenderContext, ResumeContext, initialContext } from './context';
-import { getExportTasksFromDescriptor } from './export';
+import {
+  RenderContextTemplates,
+  TASK_EXPORT,
+  TASK_VALIDATE,
+  getExportTasksFromDescriptor,
+} from './export';
 import { getRenderingTasks } from './render';
 import { FileDescriptor, getDescribedPath } from './describe';
+import { ListrTaskFn } from 'listr2';
 
 jest.mock('./render');
 jest.mock('./describe');
 
 describe('Exporting tasks', () => {
-  it('should create writing tasks from rendering, file descriptor and provided precontext options', async () => {
-    const lister = jest.fn();
-    const providedTask: Partial<ListrTaskWrapper<ResumeContext, any>> = {
+  it('should create writing tasks from file descriptor, context templates and validation task', async () => {
+    // Prepare mocks and data
+    const path = 'foobarbaz';
+    const contents = 'baz';
+
+    const lister = jest.fn().mockReturnValue({ listed: true });
+    const providedTask: Partial<ListrTaskWrapper<any, any>> = {
       newListr: lister,
     };
 
     (getDescribedPath as jest.Mock).mockReturnValue('foobarbaz');
-    const bar = jest.fn().mockResolvedValue('barbaz');
+    (getRenderingTasks as jest.Mock).mockImplementation((ctx) => ctx);
 
-    const taskGenerator = jest.fn();
-    (getRenderingTasks as jest.Mock).mockReturnValue(taskGenerator);
+    const preprocessFoo = jest.fn().mockResolvedValue('barbaz');
+    const preprocessBar = jest.fn().mockResolvedValue('barbaz');
+    const validateFn = jest.fn();
 
     const descriptor: FileDescriptor = {
       dir: 'foo',
       name: 'bar',
-      contents: 'baz',
-      wantedFormats: [],
+      contents,
     };
 
-    const expectedRenderContext: RenderContext = {
-      path: 'foobarbaz',
-      contents: 'baz',
-      prettierOptions: { tabWidth: 4 },
-      preprocessFn: bar,
+    const templates: RenderContextTemplates = {
+      foo: {
+        prettierOptions: { tabWidth: 4 },
+        preprocessFn: preprocessFoo,
+      },
+      bar: {
+        prettierOptions: { trailingComma: 'none' },
+        preprocessFn: preprocessBar,
+      },
     };
 
-    const partialRenderContext: Partial<RenderContext> = {
-      prettierOptions: { tabWidth: 4 },
-      preprocessFn: bar,
-    };
+    // Assert validation is there before any export
 
-    const context: ResumeContext = { ...initialContext };
-
-    (await getExportTasksFromDescriptor(descriptor, partialRenderContext))(
+    (await getExportTasksFromDescriptor(descriptor, templates, validateFn))(
       { ...initialContext },
       providedTask as ListrTaskWrapper<ResumeContext, any>
     );
 
-    expect(getDescribedPath).toHaveBeenCalledWith(descriptor, 'json');
-    expect(getRenderingTasks).toHaveBeenCalledWith(expectedRenderContext);
-    expect(taskGenerator).toHaveBeenCalledWith(context, providedTask);
+    const expectedInitialListr = [
+      {
+        title: TASK_VALIDATE,
+        task: validateFn,
+      },
+      {
+        title: TASK_EXPORT,
+        task: expect.anything(),
+      },
+    ];
+
+    expect(lister).toHaveBeenCalledWith(expectedInitialListr, {
+      ctx: { contents: 'baz' },
+    });
+
+    const actualInitialTasks = lister.mock.calls[0][0] as ListrTask<
+      RenderContext,
+      any
+    >[];
+
+    // Get export task and assert render generator gets called with proper generated contexts
+
+    const exportTask = actualInitialTasks.find(
+      ({ title }) => title === TASK_EXPORT
+    )?.task as ListrTaskFn<RenderContext, any>;
+
+    exportTask(
+      {
+        path: '',
+        contents: '',
+        prettierOptions: {},
+        preprocessFn: jest.fn(),
+      },
+      providedTask as ListrTaskWrapper<RenderContext, any>
+    );
+
+    const expectedExportTasks = [
+      {
+        title: 'foo',
+        task: {
+          prettierOptions: { tabWidth: 4 },
+          preprocessFn: preprocessFoo,
+          contents,
+          path,
+        },
+      },
+      {
+        title: 'bar',
+        task: {
+          prettierOptions: { trailingComma: 'none' },
+          preprocessFn: preprocessBar,
+          contents,
+          path,
+        },
+      },
+    ];
+
+    expect(lister).toHaveBeenCalledWith(expectedExportTasks);
   });
 });

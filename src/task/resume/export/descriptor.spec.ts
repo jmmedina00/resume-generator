@@ -23,14 +23,12 @@ describe('Resume descriptors', () => {
         name: 'en',
         subfolder: true,
         contents: JSON.stringify({ foo: 'bar' }),
-        wantedFormats: ['json', 'html', 'pdf'],
       },
       {
         dir: PUBLIC_DIST,
         name: 'es',
         subfolder: true,
         contents: JSON.stringify({ bar: 'baz' }),
-        wantedFormats: ['json', 'html', 'pdf'],
       },
     ];
 
@@ -53,28 +51,24 @@ describe('Resume descriptors', () => {
         name: 'en',
         subversion: '0',
         contents: JSON.stringify({ foo: 'bar' }),
-        wantedFormats: ['json', 'pdf'],
       },
       {
         dir: PRIVATE_DIST,
         name: 'en',
         subversion: '1',
         contents: JSON.stringify({ x: 'y' }),
-        wantedFormats: ['json', 'pdf'],
       },
       {
         dir: PRIVATE_DIST,
         name: 'es',
         subversion: '0',
         contents: JSON.stringify({ bar: 'baz' }),
-        wantedFormats: ['json', 'pdf'],
       },
       {
         dir: PRIVATE_DIST,
         name: 'es',
         subversion: '1',
         contents: JSON.stringify({ y: 'z' }),
-        wantedFormats: ['json', 'pdf'],
       },
     ];
 

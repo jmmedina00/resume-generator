@@ -4,7 +4,6 @@ import { FileDescriptor, getDescribedPath } from './describe';
 describe('File descriptor', () => {
   const unimportantFeatures: Partial<FileDescriptor> = {
     contents: 'foo',
-    wantedFormats: [],
   };
 
   // Generated with some help from ChatGPT

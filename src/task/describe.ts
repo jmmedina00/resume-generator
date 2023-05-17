@@ -13,8 +13,6 @@ export interface FileDescriptor {
   name: string;
   subversion?: string;
   contents: string;
-
-  wantedFormats: string[];
 }
 
 export const getDescribedPath = (

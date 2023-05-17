@@ -12,7 +12,6 @@ export const getPublicVersionDescriptors = ({
     name: version,
     subfolder: true,
     contents: JSON.stringify(publicVersions[version]),
-    wantedFormats: ['json', 'html', 'pdf'],
   }));
 
 export const getPrivateVersionDescriptors = ({
@@ -27,5 +26,4 @@ export const getPrivateVersionDescriptors = ({
       name: code,
       subversion: index.toString(),
       contents: JSON.stringify(privateVersions[code][index]),
-      wantedFormats: ['json', 'pdf'],
     }));
