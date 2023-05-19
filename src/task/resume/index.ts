@@ -19,6 +19,7 @@ import {
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './export/descriptor';
+import { FileDescriptor } from '../describe';
 
 export const TASK_COMPLETE_BASICS = 'Complete basics';
 export const TASK_COMPLETE_PROJECTS = 'Complete projects';
@@ -65,10 +66,13 @@ export const getExportTasksForAllResumeVersions = async (
   ctx: ResumeContext,
   task: ListrTaskWrapper<ResumeContext, any>
 ): Promise<Listr<ResumeContext>> => {
-  const descriptors = [
-    ...getPublicVersionDescriptors(ctx),
-    ...getPrivateVersionDescriptors(ctx),
-  ]; // TODO get better names for descriptors
+  const namer = ({ name, subversion }: FileDescriptor) =>
+    `version: ${name}` + (!subversion ? '' : `, sub: ${subversion}`);
+  const keywordedNamer = (keyword: string) => (descriptor: FileDescriptor) =>
+    [keyword, namer(descriptor)].join(' - ');
+
+  const publicDescriptors = getPublicVersionDescriptors(ctx);
+  const privateDescriptors = getPrivateVersionDescriptors(ctx);
 
   const prettierOptions = await getPrettierOptions();
   const templates: RenderContextTemplates = {
@@ -78,16 +82,22 @@ export const getExportTasksForAllResumeVersions = async (
     },
   };
 
-  const tasks = descriptors.map((descriptor) => ({
-    title: [descriptor.name, descriptor.subversion]
-      .filter((foo) => !!foo)
-      .join('-'),
-    task: getExportTasksFromDescriptor(
+  const getTask = (descriptor: FileDescriptor) =>
+    getExportTasksFromDescriptor(
       descriptor,
       templates,
       validateResumeWithSchema
-    ),
+    );
+
+  const publicTasks = publicDescriptors.map((descriptor) => ({
+    title: keywordedNamer('PUBLIC')(descriptor),
+    task: getTask(descriptor),
   }));
 
-  return task.newListr(tasks);
+  const privateTasks = privateDescriptors.map((descriptor) => ({
+    title: keywordedNamer('PRIVATE')(descriptor),
+    task: getTask(descriptor),
+  }));
+
+  return task.newListr([...publicTasks, ...privateTasks]);
 };

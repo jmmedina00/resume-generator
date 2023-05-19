@@ -138,7 +138,7 @@ describe('Resume index', () => {
 
     const expectedTasks = [
       {
-        title: 'foo-le',
+        title: 'PUBLIC - version: foo, sub: le',
         task: {
           validateFn: validateResumeWithSchema,
           templates: {
@@ -154,7 +154,7 @@ describe('Resume index', () => {
         },
       },
       {
-        title: 'bar',
+        title: 'PUBLIC - version: bar',
         task: {
           validateFn: validateResumeWithSchema,
           templates: {
@@ -169,7 +169,7 @@ describe('Resume index', () => {
         },
       },
       {
-        title: 'foo',
+        title: 'PRIVATE - version: foo',
         task: {
           validateFn: validateResumeWithSchema,
           templates: {
