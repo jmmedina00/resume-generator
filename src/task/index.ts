@@ -6,14 +6,23 @@ import {
   getExportTasksForAllResumeVersions,
   getPublicResumeCreationTasks,
 } from './resume';
+import { deleteFolder } from './io/write';
 
 export const tasks = new Listr<ResumeContext>(
   [
     {
-      title: 'Read required data',
+      title: 'Initialize state',
       task: (_, task) =>
         task.newListr(
           [
+            {
+              title: 'Delete private folder (if any)',
+              task: deleteFolder('./private'),
+            },
+            {
+              title: 'Delete private folder (if any)',
+              task: deleteFolder('./public'),
+            },
             { title: 'Read GitHub', task: readGitHub },
             { title: 'Read source resume', task: readSourceResume },
             { title: 'Read private', task: readPrivateIterations },

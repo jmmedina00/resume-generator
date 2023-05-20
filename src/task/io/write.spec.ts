@@ -1,6 +1,6 @@
-import { mkdir, writeFile } from 'fs/promises';
+import { mkdir, rm, writeFile } from 'fs/promises';
 import { ResumeContext, initialContext } from '../context';
-import { writeToFile } from './write';
+import { deleteFolder, writeToFile } from './write';
 import { dirname } from 'path';
 
 jest.mock('fs/promises');
@@ -38,5 +38,12 @@ describe('File writing', () => {
     await task(context);
 
     expect(mkdir).toHaveBeenCalledWith(dirname(path), { recursive: true });
+  });
+
+  it("should be able to delete a folder in the same fashion as 'rm -rf'", async () => {
+    const deleter = deleteFolder('./foo');
+    await deleter();
+
+    expect(rm).toHaveBeenCalledWith('./foo', { recursive: true, force: true });
   });
 });
