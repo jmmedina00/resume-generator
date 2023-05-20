@@ -3,15 +3,18 @@ import { extractKey } from '../mapping/extract';
 import { LocalisedObject } from '../mapping/locale.types';
 import { patchObject } from '../mapping/patch';
 import { GithubUserInfo } from '../service/github';
+import { Renderable, generateFromTemplate } from '../util/render/navbar';
 import {
   addGitHubInfoToBasics,
   getDekeyedSectionFromObject,
+  getNavigationBar,
   getProperProjects,
   getTranslated,
 } from './gen-public';
 import { PartialProfiles, Profile, getFullProfiles } from './profile';
 import { ResumeProject, getResumeProject } from './project';
 
+jest.mock('../util/render/navbar');
 jest.mock('../mapping/dekey');
 jest.mock('../mapping/extract');
 jest.mock('../mapping/patch');
@@ -203,5 +206,29 @@ describe('Public version generation', () => {
     expect({ ...result }).toEqual({ ...dekeyed });
     expect(extractKey).toHaveBeenCalledWith(localised, 'test');
     expect(dekeyObject).toHaveBeenCalledWith(extracted, ['foo', 'bar']);
+  });
+
+  it('should provide navigation bar node for localised object given a code', () => {
+    (generateFromTemplate as jest.Mock).mockReturnValue('Rendered');
+
+    const template = 'This is a template';
+
+    const object: LocalisedObject = {
+      flattened: {},
+      locales: { en: {}, es: {}, fr: {} },
+    };
+
+    const expectedRenderables: Renderable[] = [
+      { code: 'en', label: 'English', selected: false },
+      { code: 'es', label: 'Español', selected: true },
+      { code: 'fr', label: 'Français', selected: false },
+    ];
+
+    const navbar = getNavigationBar(template, object, 'es');
+    expect(navbar).toEqual('Rendered');
+    expect(generateFromTemplate).toHaveBeenCalledWith(
+      template,
+      expectedRenderables
+    );
   });
 });

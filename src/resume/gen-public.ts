@@ -5,6 +5,8 @@ import { dekeyObject } from '../mapping/dekey';
 import { extractKey } from '../mapping/extract';
 import { LocalisedObject } from '../mapping/locale.types';
 import { patchObject } from '../mapping/patch';
+import { Renderable, generateFromTemplate } from '../util/render/navbar';
+import langmap from 'langmap';
 
 export const addGitHubInfoToBasics = async (
   incompleteBasics: { profiles: PartialProfiles },
@@ -57,3 +59,17 @@ export const getDekeyedSectionFromObject = (
   field: string,
   defaultedSubFields: string[]
 ) => dekeyObject(extractKey(localised, field), defaultedSubFields);
+
+export const getNavigationBar = (
+  template: string,
+  { locales }: LocalisedObject,
+  activeCode: string
+) => {
+  const items: Renderable[] = Object.keys(locales).map((code) => ({
+    code,
+    label: langmap[code].nativeName,
+    selected: code === activeCode,
+  }));
+
+  return generateFromTemplate(template, items);
+};
