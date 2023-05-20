@@ -12,14 +12,14 @@ jest.mock('jsonresume-theme-bar', () => ({
 describe('Resume to document conversion', () => {
   it('should replace JSON contents with contents provided by theme', async () => {
     const context: RenderContext = {
-      contents: JSON.stringify({ foo: 'foo', bar: 'bar' }),
+      contents: Buffer.from(JSON.stringify({ foo: 'foo', bar: 'bar' })),
       path: '',
       prettierOptions: {},
       preprocessFn: jest.fn(), //This is where this feat would go
     };
 
     const expectedContext: RenderContext = {
-      contents: 'This is good',
+      contents: Buffer.from('This is good'),
       path: '',
       prettierOptions: {},
       preprocessFn: expect.anything(),

@@ -11,6 +11,6 @@ export const validateResumeWithSchema = async ({
   contents,
 }: RenderContext): Promise<void> => {
   const validator = promisify(schema.validate);
-  const resume = JSON.parse(contents);
+  const resume = JSON.parse(contents.toString());
   await validator(resume);
 };

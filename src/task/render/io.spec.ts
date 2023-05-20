@@ -11,7 +11,7 @@ describe('Rendering wrapper tasks', () => {
 
     const context: RenderContext = {
       path: 'foo/bar',
-      contents: 'why dis not work on its own',
+      contents: Buffer.from('why dis not work on its own'),
       prettierOptions: {},
       preprocessFn: jest.fn(),
     };
@@ -20,7 +20,7 @@ describe('Rendering wrapper tasks', () => {
     const [path, fn] = (writeToFile as jest.Mock).mock.calls[0];
 
     expect(path).toEqual('foo/bar');
-    expect(fn(context)).toEqual('why dis not work on its own');
+    expect(fn(context)).toEqual(Buffer.from('why dis not work on its own'));
 
     expect(writer).toHaveBeenCalledWith(context);
   });

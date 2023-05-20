@@ -67,7 +67,7 @@ describe('Exporting tasks', () => {
     ];
 
     expect(lister).toHaveBeenCalledWith(expectedInitialListr, {
-      ctx: { contents: 'baz' },
+      ctx: { contents: Buffer.from('baz') },
     });
 
     const actualInitialTasks = lister.mock.calls[0][0] as ListrTask<
@@ -84,7 +84,7 @@ describe('Exporting tasks', () => {
     exportTask(
       {
         path: '',
-        contents: '',
+        contents: Buffer.from(''),
         prettierOptions: {},
         preprocessFn: jest.fn(),
       },
@@ -97,7 +97,7 @@ describe('Exporting tasks', () => {
         task: {
           prettierOptions: { tabWidth: 4 },
           preprocessFn: preprocessFoo,
-          contents,
+          contents: Buffer.from('baz'),
           path,
         },
       },
@@ -106,7 +106,7 @@ describe('Exporting tasks', () => {
         task: {
           prettierOptions: { trailingComma: 'none' },
           preprocessFn: preprocessBar,
-          contents,
+          contents: Buffer.from('baz'),
           path,
         },
       },

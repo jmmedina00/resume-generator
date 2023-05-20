@@ -27,7 +27,8 @@ export const getExportTasksFromDescriptor =
     _: ResumeContext,
     task: ListrTaskWrapper<ResumeContext, any>
   ): Listr<RenderContext> => {
-    const { contents } = descriptor;
+    const { contents: contentString } = descriptor;
+    const contents = Buffer.from(contentString);
 
     const exportTasks = Object.entries(templates).map(
       ([format, partialContext]) => {

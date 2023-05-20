@@ -26,7 +26,7 @@ describe('Resume rendering config', () => {
 
     const context: RenderContext = {
       path: 'foo/bar',
-      contents: JSON.stringify(object),
+      contents: Buffer.from(JSON.stringify(object)),
       prettierOptions: {},
       preprocessFn: jest.fn(),
     };

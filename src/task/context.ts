@@ -24,7 +24,7 @@ export interface ResumeContext {
 
 export interface RenderContext {
   path: string;
-  contents: string;
+  contents: Buffer;
 
   prettierOptions: Options;
   preprocessFn: (foo: any) => Promise<any>;

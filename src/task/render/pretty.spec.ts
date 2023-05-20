@@ -11,14 +11,14 @@ describe('Prettify tasks', () => {
 
     const context: RenderContext = {
       path: 'foo/bar',
-      contents: "{'test': 12, 'foo':'bar'}",
+      contents: Buffer.from("{'test': 12, 'foo':'bar'}"),
       preprocessFn: validateFn,
       prettierOptions: { endOfLine: 'auto', quoteProps: 'as-needed' },
     };
 
     const expectedContext: RenderContext = {
       ...context,
-      contents: 'Das pretty',
+      contents: Buffer.from('Das pretty'),
     };
 
     await prettifyContentsofContext(context);
