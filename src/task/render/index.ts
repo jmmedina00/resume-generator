@@ -8,7 +8,11 @@ export const getRenderingTasks =
     task.newListr<RenderContext>(
       [
         { title: 'Preprocess input', task: renderCtx.preprocessFn },
-        { title: 'Prettify input', task: prettifyContentsofContext },
+        {
+          title: 'Prettify input',
+          task: prettifyContentsofContext,
+          enabled: (ctx) => !!ctx.prettierOptions,
+        },
         {
           title: 'Write to file',
           task: writeContextToFile,
