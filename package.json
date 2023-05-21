@@ -32,7 +32,7 @@
     "prettier": "^2.8.7",
     "puppeteer": "^20.2.1",
     "resume-schema": "^1.0.0",
-    "yaml": "^2.2.1"
+    "yaml": "^2.2.2"
   },
   "devDependencies": {
     "@octokit/openapi-types": "^16.0.0",
