@@ -57,5 +57,9 @@ export const tasks = new Listr<ResumeContext>(
         task.newListr(uploadFolderToDrive('./private'), { concurrent: true }),
     },
   ],
-  { collectErrors: 'minimal', rendererOptions: { collapseSubtasks: false } }
+  {
+    collectErrors: 'minimal',
+    rendererOptions: { collapseSubtasks: false },
+    fallbackRendererCondition: () => !!process.env['CI'],
+  }
 );

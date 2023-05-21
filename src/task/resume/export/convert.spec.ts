@@ -133,7 +133,10 @@ describe('Resume to document conversion', () => {
     expect(moduleFoo.render).toHaveBeenCalledWith({ foo: 'foo', bar: 'bar' });
     expect(moduleBar.render).not.toHaveBeenCalled();
 
-    expect(puppeteer.launch).toHaveBeenCalledWith({ headless: 'new' });
+    expect(puppeteer.launch).toHaveBeenCalledWith({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
     expect((puppeteer as any).browser.newPage).toHaveBeenCalled();
     expect((puppeteer as any).browser.close).toHaveBeenCalled();
     expect((puppeteer as any).setContent).toHaveBeenCalledWith('This is good', {

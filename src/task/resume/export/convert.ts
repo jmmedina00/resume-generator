@@ -37,7 +37,10 @@ export const getResumeToPdfConverter =
 
     const rendered = theme.render(resume);
 
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Quick hack so that it doesn't crash on GitHub Actions
+    });
     const page = await browser.newPage();
 
     await page.setContent(rendered, { waitUntil: 'networkidle0' });
