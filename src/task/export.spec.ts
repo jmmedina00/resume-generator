@@ -1,5 +1,10 @@
 import { ListrTask, ListrTaskWrapper } from 'listr2';
-import { RenderContext, ResumeContext, initialContext } from './context';
+import {
+  RenderContext,
+  RenderWithTemplateContext,
+  ResumeContext,
+  initialContext,
+} from './context';
 import {
   RenderContextTemplates,
   TASK_EXPORT,
@@ -41,6 +46,7 @@ describe('Exporting tasks', () => {
       foo: {
         prettierOptions: { tabWidth: 4 },
         preprocessFn: preprocessFoo,
+        templateContents: 'lalala',
       },
       bar: {
         prettierOptions: { trailingComma: 'none' },
@@ -99,6 +105,8 @@ describe('Exporting tasks', () => {
           preprocessFn: preprocessFoo,
           contents: Buffer.from('baz'),
           path,
+          activePage: 'bar',
+          templateContents: 'lalala',
         },
       },
       {
@@ -108,6 +116,7 @@ describe('Exporting tasks', () => {
           preprocessFn: preprocessBar,
           contents: Buffer.from('baz'),
           path,
+          activePage: 'bar',
         },
       },
     ];

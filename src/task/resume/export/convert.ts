@@ -1,15 +1,32 @@
-import { RenderContext } from '../../context';
+import { getNavigationBar } from '../../../resume/gen-public';
+import { addAtBodyTop, addStyles } from '../../../util/render';
+import {
+  RenderContext,
+  RenderWithTemplateContext,
+  ResumeContext,
+} from '../../context';
 import puppeteer from 'puppeteer';
 
 const getTheme = (themeModule: string) => 'jsonresume-theme-' + themeModule;
 
 export const getResumeToDocumentConverter =
-  (themeModule: string) =>
-  async (ctx: RenderContext): Promise<void> => {
-    const resume = JSON.parse(ctx.contents.toString());
+  (themeModule: string, resume: ResumeContext) =>
+  async (ctx: RenderWithTemplateContext): Promise<void> => {
+    const jsonResume = JSON.parse(ctx.contents.toString());
     const theme = require(getTheme(themeModule));
 
-    ctx.contents = Buffer.from(theme.render(resume));
+    const rendered = theme.render(jsonResume);
+
+    const navbar = getNavigationBar(
+      ctx.templateContents || '',
+      resume.localised,
+      ctx.activePage
+    );
+
+    const withAppendedNavbar = addAtBodyTop(rendered, navbar);
+    const fullyStyled = addStyles(withAppendedNavbar, ctx.templateStyles || '');
+
+    ctx.contents = Buffer.from(fullyStyled);
   };
 
 export const getResumeToPdfConverter =

@@ -1,10 +1,18 @@
 import { beforeEach } from 'node:test';
-import { RenderContext } from '../../context';
+import {
+  RenderContext,
+  RenderWithTemplateContext,
+  ResumeContext,
+  initialContext,
+} from '../../context';
 import {
   getResumeToDocumentConverter,
   getResumeToPdfConverter,
 } from './convert';
 import puppeteer from 'puppeteer';
+import { getNavigationBar } from '../../../resume/gen-public';
+import { addAtBodyTop, addStyles } from '../../../util/render';
+import { LocalisedObject } from '../../../mapping/locale.types';
 
 jest.mock('jsonresume-theme-foo', () => ({
   render: jest.fn().mockReturnValue('This is good'),
@@ -32,23 +40,50 @@ jest.mock('puppeteer', () => {
   return { launch, browser, pdf, setContent };
 });
 
+jest.mock('../../../resume/gen-public');
+jest.mock('../../../util/render');
+
 describe('Resume to document conversion', () => {
-  it('should replace JSON contents with contents provided by theme', async () => {
-    const context: RenderContext = {
+  it('should replace JSON contents with contents provided by theme and navbar snip', async () => {
+    (getNavigationBar as jest.Mock).mockReturnValue('Navigation bar');
+    (addAtBodyTop as jest.Mock).mockImplementation((foo, bar) =>
+      [foo, bar].join(' - ')
+    );
+    (addStyles as jest.Mock).mockImplementation(
+      (foo, bar) => foo + ', styled with ' + bar
+    );
+
+    const localised: LocalisedObject = {
+      flattened: { re: 'foo' },
+      locales: { en: { re: 'bar' }, es: { re: 'baz' } },
+    };
+
+    const resumeContext: ResumeContext = {
+      ...initialContext,
+      localised,
+    };
+
+    const context: RenderWithTemplateContext = {
       contents: Buffer.from(JSON.stringify({ foo: 'foo', bar: 'bar' })),
       path: '',
       prettierOptions: {},
       preprocessFn: jest.fn(), //This is where this feat would go
+      activePage: 're',
+      templateContents: 'qwerty',
+      templateStyles: 'la',
     };
 
-    const expectedContext: RenderContext = {
-      contents: Buffer.from('This is good'),
+    const expectedContext: RenderWithTemplateContext = {
+      contents: Buffer.from('This is good - Navigation bar, styled with la'),
       path: '',
       prettierOptions: {},
       preprocessFn: expect.anything(),
+      activePage: 're',
+      templateContents: 'qwerty',
+      templateStyles: 'la',
     };
 
-    const converter = getResumeToDocumentConverter('foo');
+    const converter = getResumeToDocumentConverter('foo', resumeContext);
     await converter(context);
 
     expect(context).toEqual(expectedContext);
@@ -58,6 +93,18 @@ describe('Resume to document conversion', () => {
 
     expect(moduleFoo.render).toHaveBeenCalledWith({ foo: 'foo', bar: 'bar' });
     expect(moduleBar.render).not.toHaveBeenCalled();
+
+    expect(getNavigationBar).toHaveBeenCalledWith(
+      'qwerty',
+      { ...localised },
+      're'
+    );
+
+    expect(addAtBodyTop).toHaveBeenCalledWith('This is good', 'Navigation bar');
+    expect(addStyles).toHaveBeenCalledWith(
+      'This is good - Navigation bar',
+      'la'
+    );
   });
 
   it('should replace JSON contents with PDF generated with Puppeteer', async () => {

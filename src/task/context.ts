@@ -30,6 +30,12 @@ export interface RenderContext {
   preprocessFn: (foo: any) => Promise<any>;
 }
 
+export interface RenderWithTemplateContext extends RenderContext {
+  templateContents?: string;
+  templateStyles?: string;
+  activePage: string;
+}
+
 export const initialContext: ResumeContext = {
   githubUser: {
     user: '',

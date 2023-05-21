@@ -1,5 +1,9 @@
 import { Listr, ListrTaskWrapper } from 'listr2';
-import { RenderContext, ResumeContext } from './context';
+import {
+  RenderContext,
+  RenderWithTemplateContext,
+  ResumeContext,
+} from './context';
 import { getRenderingTasks } from './render';
 import { FileDescriptor, getDescribedPath } from './describe';
 import { Options } from 'prettier';
@@ -12,6 +16,8 @@ export const TASK_EXPORT = 'Export to formats';
 
 export interface RenderContextTemplates {
   [format: string]: {
+    templateContents?: string;
+    templateStyles?: string;
     prettierOptions: Options;
     preprocessFn: (ctx: RenderContext) => Promise<any>;
   };
@@ -32,8 +38,9 @@ export const getExportTasksFromDescriptor =
 
     const exportTasks = Object.entries(templates).map(
       ([format, partialContext]) => {
-        const context: RenderContext = {
+        const context: RenderWithTemplateContext = {
           ...partialContext,
+          activePage: descriptor.name,
           contents,
           path: getDescribedPath(descriptor, format),
         };
