@@ -29,11 +29,18 @@ import {
   getPublicVersionDescriptors,
 } from './export/descriptor';
 import { FileDescriptor } from '../describe';
+import { readFile } from 'node:fs/promises';
+import {
+  getResumeToDocumentConverter,
+  getResumeToPdfConverter,
+} from './export/convert';
 
 jest.mock('./public');
 jest.mock('./export/config');
 jest.mock('../export');
 jest.mock('./export/descriptor');
+jest.mock('./export/convert');
+jest.mock('node:fs/promises');
 
 describe('Resume index', () => {
   it('should produce public resume creation tasks', () => {
@@ -103,6 +110,19 @@ describe('Resume index', () => {
       newListr: lister,
     };
 
+    const document = jest.fn();
+    const pdf = jest.fn();
+
+    (getResumeToDocumentConverter as jest.Mock).mockReturnValue(document);
+    (getResumeToPdfConverter as jest.Mock).mockReturnValue(pdf);
+
+    (readFile as jest.Mock).mockImplementation(
+      async (path: string) =>
+        ({
+          './assets/navbar.html': 'Navbar',
+          './assets/styles.css': 'Styles',
+        }[path] || '')
+    );
     (getPublicVersionDescriptors as jest.Mock).mockReturnValue([
       {
         dir: 'public',
@@ -146,6 +166,16 @@ describe('Resume index', () => {
               prettierOptions,
               preprocessFn: expect.anything(),
             },
+            html: {
+              templateContents: 'Navbar',
+              templateStyles: 'Styles',
+              prettierOptions: { ...prettierOptions, parser: 'html' },
+              preprocessFn: document,
+            },
+            pdf: {
+              prettierOptions: null,
+              preprocessFn: pdf,
+            },
           },
           dir: 'public',
           name: 'foo',
@@ -162,6 +192,16 @@ describe('Resume index', () => {
               prettierOptions,
               preprocessFn: expect.anything(),
             },
+            html: {
+              templateContents: 'Navbar',
+              templateStyles: 'Styles',
+              prettierOptions: { ...prettierOptions, parser: 'html' },
+              preprocessFn: document,
+            },
+            pdf: {
+              prettierOptions: null,
+              preprocessFn: pdf,
+            },
           },
           dir: 'publica',
           name: 'bar',
@@ -176,6 +216,10 @@ describe('Resume index', () => {
             json: {
               prettierOptions,
               preprocessFn: expect.anything(),
+            },
+            pdf: {
+              prettierOptions: null,
+              preprocessFn: pdf,
             },
           },
           dir: 'private',

@@ -1,0 +1,19 @@
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');
+
+.additional-navigation {
+  grid-column: full;
+}
+
+.additional-navigation ul {
+  padding: 0;
+
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1em;
+}
+
+.additional-navigation ul li {
+  margin: 0;
+}

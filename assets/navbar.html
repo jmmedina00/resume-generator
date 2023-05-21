@@ -1,11 +1,14 @@
-<nav>
+<nav class="additional-navigation">
   <ul>
     {{#items}}
     <li>
-      <a href="./{{code}}" class="{{#selected}}active{{/selected}}">
-        {{label}}
-      </a>
+      {{^selected}}<a href="../{{code}}" class="active"
+        >{{/selected}} {{label}} {{^selected}}</a
+      >{{/selected}}
     </li>
     {{/items}}
+    <li>
+      <a href="resume.pdf" class="bi-download"></a>
+    </li>
   </ul>
 </nav>

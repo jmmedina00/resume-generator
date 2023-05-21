@@ -1,5 +1,5 @@
-import { mkdir, rm, writeFile } from 'fs/promises';
-import { dirname } from 'path';
+import { mkdir, readFile, rm, writeFile } from 'fs/promises';
+import { basename, dirname, format } from 'path';
 
 export type FileWriter<T> = (
   path: string,
@@ -14,4 +14,11 @@ export const writeToFile: FileWriter<any> = (path, fn) => async (ctx) => {
 
 export const deleteFolder = (path: string) => async () => {
   await rm(path, { recursive: true, force: true });
+};
+
+export const copyFileToFolder = (from: string, to: string) => async () => {
+  const file = await readFile(from);
+
+  const filename = basename(from);
+  await writeFile(format({ name: filename, dir: to }), file);
 };

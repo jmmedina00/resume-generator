@@ -1,9 +1,6 @@
 import { Listr, ListrTaskWrapper } from 'listr2';
-import { RenderContext, ResumeContext } from '../context';
-import {
-  RenderContextTemplates,
-  getExportTasksFromDescriptor,
-} from '../export';
+import { ResumeContext } from '../context';
+import { getExportTasksFromDescriptor } from '../export';
 import { getPrettierOptions, validateResumeWithSchema } from './export/config';
 import {
   transformAndReplaceLocalisedField,
@@ -20,6 +17,12 @@ import {
   getPublicVersionDescriptors,
 } from './export/descriptor';
 import { FileDescriptor } from '../describe';
+import {
+  getResumeToDocumentConverter,
+  getResumeToPdfConverter,
+} from './export/convert';
+import { readFile } from 'node:fs/promises';
+import { Options } from 'prettier';
 
 export const TASK_COMPLETE_BASICS = 'Complete basics';
 export const TASK_COMPLETE_PROJECTS = 'Complete projects';
@@ -66,6 +69,9 @@ export const getExportTasksForAllResumeVersions = async (
   ctx: ResumeContext,
   task: ListrTaskWrapper<ResumeContext, any>
 ): Promise<Listr<ResumeContext>> => {
+  const THEME_HTML = 'even';
+  const THEME_PDF = 'spartacus';
+
   const namer = ({ name, subversion }: FileDescriptor) =>
     `version: ${name}` + (!subversion ? '' : `, sub: ${subversion}`);
   const keywordedNamer = (keyword: string) => (descriptor: FileDescriptor) =>
@@ -75,29 +81,45 @@ export const getExportTasksForAllResumeVersions = async (
   const privateDescriptors = getPrivateVersionDescriptors(ctx);
 
   const prettierOptions = await getPrettierOptions();
-  const templates: RenderContextTemplates = {
-    json: {
-      prettierOptions,
-      preprocessFn: async () => {},
-    },
+  const htmlOptions = { ...prettierOptions, parser: 'html' };
+
+  const navbarTemplate = await readFile('./assets/navbar.html', 'utf-8');
+  const navbarStyles = await readFile('./assets/styles.css', 'utf-8');
+
+  const jsonRender = {
+    prettierOptions,
+    preprocessFn: async () => {},
   };
 
-  const getTask = (descriptor: FileDescriptor) =>
-    getExportTasksFromDescriptor(
-      descriptor,
-      templates,
-      validateResumeWithSchema
-    );
+  const docRender = {
+    templateContents: navbarTemplate,
+    templateStyles: navbarStyles,
+    prettierOptions: htmlOptions,
+    preprocessFn: getResumeToDocumentConverter(THEME_HTML, ctx),
+  };
+
+  const pdfRender = {
+    prettierOptions: null as unknown as Options,
+    preprocessFn: getResumeToPdfConverter(THEME_PDF),
+  };
 
   const publicTasks = publicDescriptors.map((descriptor) => ({
     title: keywordedNamer('PUBLIC')(descriptor),
-    task: getTask(descriptor),
+    task: getExportTasksFromDescriptor(
+      descriptor,
+      { json: jsonRender, html: docRender, pdf: pdfRender },
+      validateResumeWithSchema
+    ),
   }));
 
   const privateTasks = privateDescriptors.map((descriptor) => ({
     title: keywordedNamer('PRIVATE')(descriptor),
-    task: getTask(descriptor),
+    task: getExportTasksFromDescriptor(
+      descriptor,
+      { json: jsonRender, pdf: pdfRender },
+      validateResumeWithSchema
+    ),
   }));
 
-  return task.newListr([...publicTasks, ...privateTasks]);
+  return task.newListr([...publicTasks, ...privateTasks], { concurrent: true });
 };

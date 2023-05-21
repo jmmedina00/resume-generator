@@ -19,7 +19,7 @@ export interface RenderContextTemplates {
     templateContents?: string;
     templateStyles?: string;
     prettierOptions: Options;
-    preprocessFn: (ctx: RenderContext) => Promise<any>;
+    preprocessFn: (ctx: any) => Promise<any>;
   };
 }
 

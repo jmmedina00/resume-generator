@@ -1,6 +1,6 @@
-import { mkdir, rm, writeFile } from 'fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { ResumeContext, initialContext } from '../context';
-import { deleteFolder, writeToFile } from './write';
+import { copyFileToFolder, deleteFolder, writeToFile } from './write';
 import { dirname } from 'path';
 
 jest.mock('fs/promises');
@@ -45,5 +45,14 @@ describe('File writing', () => {
     await deleter();
 
     expect(rm).toHaveBeenCalledWith('./foo', { recursive: true, force: true });
+  });
+
+  it('should be able to copy a file to a folder', async () => {
+    (readFile as jest.Mock).mockResolvedValue('Test');
+
+    const copier = copyFileToFolder('./foo/baz.txt', './bar');
+    await copier();
+
+    expect(writeFile).toHaveBeenCalledWith('./bar/baz.txt', 'Test');
   });
 });

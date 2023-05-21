@@ -6,7 +6,7 @@ import {
   getExportTasksForAllResumeVersions,
   getPublicResumeCreationTasks,
 } from './resume';
-import { deleteFolder } from './io/write';
+import { copyFileToFolder, deleteFolder } from './io/write';
 
 export const tasks = new Listr<ResumeContext>(
   [
@@ -43,6 +43,10 @@ export const tasks = new Listr<ResumeContext>(
     {
       title: 'Export resume versions',
       task: getExportTasksForAllResumeVersions,
+    },
+    {
+      title: 'Add index to public folder',
+      task: copyFileToFolder('./assets/index.html', './public'),
     },
   ],
   { collectErrors: 'minimal', rendererOptions: { collapseSubtasks: false } }
