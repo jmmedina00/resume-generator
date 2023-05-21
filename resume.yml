@@ -1,0 +1,204 @@
+basics:
+  label:
+    en: Software Developer
+    es: Desarrollador de software
+  summary:
+    en: (Mostly web) coder. Quite curious; always seeking the best compromise and learning from new experiences.
+    es: Programador (web, en su mayor parte). Curioso, siempre busco el término medio ideal mientras aprendo de nuevas experiencias.
+  location:
+    city: Málaga
+    countryCode: ES
+  profiles:
+    linkedin:
+      url: https://www.linkedin.com/in/juan-miguel-medina-prieto-88926715a/
+
+languages:
+  - language:
+      es: Español
+      en: Spanish
+    fluency:
+      es: Nativo
+      en: Native speaker
+  - language:
+      es: Inglés
+      en: English
+    fluency: B2
+  - language:
+      es: Francés
+      en: French
+    fluency: B1
+
+certificates: Get from Credly
+
+projects:
+  rolldapass:
+    type: application
+    repo-description: en
+    page-active: yes
+
+    description:
+      es: Generador de contraseñas hecho con React y Redux
+    startDate: 2022-09-09
+    endDate: 2022-10-30
+
+  fancy-countdown:
+    type: application
+    repo-description: en
+    page-active: yes
+
+    description:
+      es: Cuenta atrás glorificada
+    startDate: 2022-08-20
+    endDate: 2022-09-08
+
+skills:
+  - name:
+      en: Programming
+      es: Programación
+    level: Junior
+    keywords:
+      - es: Tests unitarios
+        en: Unit Testing
+      - Git
+      - SCRUM
+
+  - name: Frontend
+    level: Junior
+    keywords:
+      - JavaScript
+      - CSS / Sass
+      - Bootstrap
+      - Angular
+  - name: Backend
+    level: Junior
+    keywords:
+      - Java
+      - Node.js
+      - Spring Boot
+      - REST APIs
+  - name:
+      en: Systems
+      es: Sistemas
+    level: Junior
+    keywords:
+      - Linux
+      - Docker
+      - GitHub Actions
+      - Microsoft Azure
+
+work:
+  ey-dev:
+    name: EY
+    url: https://www.ey.com/
+    position:
+      en: Full-Stack Developer
+      es: Desarrollador full-stack
+    startDate: 2023-01-23
+    summary:
+      en: Development of in-house accounting project management platform
+      es: Desarrollo de plataforma interna para administrar proyectos de contabilidad
+    highlights:
+      - Angular
+      - Spring Boot
+
+      - en: Implementing use cases
+        es: Implementación de casos de uso
+
+      - en: Unit test creation
+        es: Creación de tests unitarios
+
+      - en: Code refactoring and planning
+        es: Refactorización y planificación de código
+
+      - en: Organizing with the help of SCRUM
+        es: Organización y planificación del trabajo con SCRUM
+
+  tekwurx-consulting:
+    name: Tekwurx
+    url: https://tekwurx.com/
+    position:
+      en: Technical Consultant
+      es: Consultor técnico
+    startDate: 2021-04-03
+    endDate: 2023-01-20
+    summary:
+      en: Network software consulting and maintenance activities
+      es: Consultoría y mantenimiento de software de redes
+    highlights:
+      - BMC Discovery
+      - Excel
+
+      - en: In-field process documentation
+        es: Documentación de procesos realizados en el cliente
+
+  jammer-fct:
+    name: JAMMER
+    url: https://www.linkedin.com/company/tryjammer/
+    position:
+      en: Full-Stack Developer
+      es: Desarrollador full-stack
+    startDate: 2020-09-30
+    endDate: 2020-12-15
+    summary:
+      en: Real state management platform development. On the Job Training.
+      es: Desarrollo de plataforma de administración de propiedades. Formación en Centro de Trabajo
+    highlights:
+      - Angular
+      - RxJS
+      - Nest.js
+
+      - en: Code refactoring
+        es: Refactorización de código
+
+      - en: Demo environment bootstrapping
+        es: Preparación de entornos para demos
+
+education:
+  daw-politecnico:
+    institution: IES Politécnico Jesús Marín
+    url: https://politecnicomalaga.com/
+    area:
+      en: Development of Web Applications
+      es: Desarrollo de Aplicaciones Web
+    studyType:
+      es: Ciclo Formativo de Grado Superior
+      en: Certificate of Higher Education (CFGS in Spain)
+    startDate: 2018-09-16
+    endDate: 2020-12-20
+    score: 8/10
+    courses:
+      - en: Computer Systems
+        es: Sistemas informáticos
+
+      - en: Databases
+        es: Bases de datos
+
+      - en: Programming
+        es: Programación
+
+      - en: Markup Languages
+        es: Lenguajes de marcas
+
+      - en: Development Environments
+        es: Entornos de desarollo
+
+      - en: Client Environment Web Development
+        es: Desarrollo web en entorno cliente
+
+      - en: Server Environment Web Development
+        es: Desarrollo web en entorno server
+
+      - en: Web Applicacion Deployment
+        es: Despliegue de aplicaciones web
+
+      - en: Web Interface Design
+        es: Diseño de interfaces web
+
+      - en: Vocational Training and Guidance
+        es: Formación y orientación laboral
+
+      - en: Business/Entrepeneur Initiative
+        es: Empresa e iniciativa emprendedora
+
+      - en: On The Job Training @ JAMMER
+        es: Formación en Centro de Trabajo @ JAMMER
