@@ -2,11 +2,9 @@ import { Listr } from 'listr2';
 import { ResumeContext } from './context';
 import { readGitHub, readPrivateIterations, readSourceResume } from './io/read';
 import { generatePrivateVersions } from './resume/private';
-import {
-  getExportTasksForAllResumeVersions,
-  getPublicResumeCreationTasks,
-} from './resume';
+import { getPublicResumeCreationTasks } from './resume';
 import { copyFileToFolder, deleteFolder } from './io/write';
+import { getExportTasksForAllResumeVersions } from './resume/export';
 
 export const tasks = new Listr<ResumeContext>(
   [
