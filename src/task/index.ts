@@ -5,6 +5,7 @@ import { generatePrivateVersions } from './resume/private';
 import { getPublicResumeCreationTasks } from './resume';
 import { copyFileToFolder, deleteFolder } from './io/write';
 import { getExportTasksForAllResumeVersions } from './resume/export';
+import { clearDriveFolder, uploadFolderToDrive } from './io/upload';
 
 export const tasks = new Listr<ResumeContext>(
   [
@@ -20,6 +21,10 @@ export const tasks = new Listr<ResumeContext>(
             {
               title: 'Delete private folder (if any)',
               task: deleteFolder('./public'),
+            },
+            {
+              title: 'Clear Drive folder',
+              task: clearDriveFolder,
             },
             { title: 'Read GitHub', task: readGitHub },
             { title: 'Read source resume', task: readSourceResume },
@@ -45,6 +50,11 @@ export const tasks = new Listr<ResumeContext>(
     {
       title: 'Add index to public folder',
       task: copyFileToFolder('./assets/index.html', './public'),
+    },
+    {
+      title: 'Upload entire private folder to Drive',
+      task: (_, task) =>
+        task.newListr(uploadFolderToDrive('./private'), { concurrent: true }),
     },
   ],
   { collectErrors: 'minimal', rendererOptions: { collapseSubtasks: false } }
