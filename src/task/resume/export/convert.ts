@@ -1,3 +1,4 @@
+import { render } from 'mustache';
 import { getNavigationBar } from '../../../resume/gen-public';
 import { addAtBodyTop, addStyles } from '../../../util/render';
 import {
@@ -6,8 +7,20 @@ import {
   ResumeContext,
 } from '../../context';
 import puppeteer from 'puppeteer';
+import { readFile } from 'fs/promises';
 
 const getTheme = (themeModule: string) => 'jsonresume-theme-' + themeModule;
+
+export const getResumeToFilledTemplateConverter =
+  (templatePath: string) =>
+  async (ctx: RenderContext): Promise<void> => {
+    const jsonResume = JSON.parse(ctx.contents.toString());
+
+    const template = await readFile(templatePath, 'utf-8');
+    const rendered = render(template, jsonResume);
+
+    ctx.contents = Buffer.from(rendered);
+  };
 
 export const getResumeToDocumentConverter =
   (themeModule: string, resume: ResumeContext) =>
