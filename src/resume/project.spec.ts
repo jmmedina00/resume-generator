@@ -255,6 +255,12 @@ describe('Project conversion', () => {
         type: 'application',
         startDate: 'foo',
         endDate: 'bar',
+        highlights: [
+          'test',
+          { en: 'foo', es: 'bar' },
+          { fr: 'bar', de: 'baz' },
+          'testing',
+        ],
       };
 
       const project: RepoProject = {
@@ -266,14 +272,20 @@ describe('Project conversion', () => {
           en: 'Kitty',
           es: 'Gato',
         },
+        highlights: [
+          'test',
+          { en: 'foo', es: 'bar' },
+          { fr: 'bar', de: 'baz' },
+          'testing',
+        ],
         'page-active': true,
       };
 
-      const { type, startDate, endDate } = await getResumeProject(
+      const { type, startDate, endDate, highlights } = await getResumeProject(
         project,
         gitHubInfo
       );
-      const actual = { type, startDate, endDate };
+      const actual = { type, startDate, endDate, highlights };
 
       expect(actual).toEqual(expected);
     });

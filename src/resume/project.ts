@@ -12,6 +12,7 @@ interface Project {
   startDate: string;
   endDate: string;
   description: { [code in LanguageCode]?: string };
+  highlights?: ({ [code in LanguageCode]?: string } | string)[];
 }
 
 export interface RepoProject extends Project {
