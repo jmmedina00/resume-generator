@@ -7,6 +7,8 @@ import { copyFileToFolder, deleteFolder } from './io/write';
 import { getExportTasksForAllResumeVersions } from './resume/export';
 import { clearDriveFolder, uploadFolderToDrive } from './io/upload';
 
+export const isThisCI = () => !!process.env['CI'];
+
 export const tasks = new Listr<ResumeContext>(
   [
     {
@@ -25,6 +27,7 @@ export const tasks = new Listr<ResumeContext>(
             {
               title: 'Clear Drive folder',
               task: clearDriveFolder,
+              enabled: isThisCI,
             },
             { title: 'Read GitHub', task: readGitHub },
             { title: 'Read source resume', task: readSourceResume },
@@ -55,11 +58,12 @@ export const tasks = new Listr<ResumeContext>(
       title: 'Upload entire private folder to Drive',
       task: (_, task) =>
         task.newListr(uploadFolderToDrive('./private'), { concurrent: true }),
+      enabled: isThisCI,
     },
   ],
   {
     collectErrors: 'minimal',
     rendererOptions: { collapseSubtasks: false },
-    fallbackRendererCondition: () => !!process.env['CI'],
+    fallbackRendererCondition: isThisCI,
   }
 );
