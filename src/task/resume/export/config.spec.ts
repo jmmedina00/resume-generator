@@ -1,7 +1,27 @@
 import { Options, resolveConfig } from 'prettier';
-import { RenderContext } from '../../context';
-import { getPrettierOptions, validateResumeWithSchema } from './config';
+import { RenderContext, ResumeContext, initialContext } from '../../context';
+import {
+  PATH_MARKDOWN_TEMPLATE,
+  PATH_NAVBAR_STYLES,
+  PATH_NAVBAR_TEMPLATE,
+  THEME_HTML,
+  THEME_PDF,
+  getHtmlRender,
+  getJsonRender,
+  getMarkdownRender,
+  getPdfRender,
+  getPrettierOptions,
+  validateResumeWithSchema,
+} from './config';
+import {
+  getResumeToDocumentConverter,
+  getResumeToFilledTemplateConverter,
+  getResumeToPdfConverter,
+} from './convert';
+import { readFile } from 'fs/promises';
 
+jest.mock('./convert');
+jest.mock('fs/promises');
 jest.mock('prettier');
 jest.mock('resume-schema', () => ({
   // Successful callback function, turned into promise by promisify
@@ -38,5 +58,62 @@ describe('Resume rendering config', () => {
       { ...object },
       expect.anything()
     );
+  });
+
+  it('should provide JSON renderer from Prettier options', async () => {
+    const prettierOptions: Options = { singleQuote: false, printWidth: 7 };
+
+    const render = await getJsonRender(prettierOptions);
+    expect(render).toEqual({
+      prettierOptions,
+      preprocessFn: expect.anything(),
+    });
+  });
+
+  it('should provide PDF renderer without any Prettier options and with specific processor', async () => {
+    (getResumeToPdfConverter as jest.Mock).mockImplementation((theme) => ({
+      theme,
+    }));
+
+    const render = await getPdfRender();
+    expect(render).toEqual({
+      prettierOptions: null,
+      preprocessFn: { theme: THEME_PDF },
+    });
+  });
+
+  it('should provide Markdown renderer with appended Prettier options and specific processor', async () => {
+    const prettierOptions: Options = { singleQuote: false, printWidth: 7 };
+    (getResumeToFilledTemplateConverter as jest.Mock).mockImplementation(
+      (template) => ({ template })
+    );
+
+    const render = await getMarkdownRender(prettierOptions);
+    expect(render).toEqual({
+      prettierOptions: { ...prettierOptions, parser: 'markdown' },
+      preprocessFn: { template: PATH_MARKDOWN_TEMPLATE },
+    });
+  });
+
+  it('should provide HTML renderer with appended Prettier options, loaded files and processor with context', async () => {
+    const prettierOptions: Options = { singleQuote: false, printWidth: 7 };
+    const resumeContext: ResumeContext = { ...initialContext };
+
+    (readFile as jest.Mock).mockImplementation((path) => {
+      if (path === PATH_NAVBAR_STYLES) return 'styles';
+      if (path === PATH_NAVBAR_TEMPLATE) return 'template';
+      return '';
+    });
+    (getResumeToDocumentConverter as jest.Mock).mockImplementation(
+      (theme, context) => ({ theme, context })
+    );
+
+    const render = await getHtmlRender(prettierOptions, resumeContext);
+    expect(render).toEqual({
+      templateContents: 'template',
+      templateStyles: 'styles',
+      prettierOptions: { ...prettierOptions, parser: 'html' },
+      preprocessFn: { theme: THEME_HTML, context: resumeContext },
+    });
   });
 });

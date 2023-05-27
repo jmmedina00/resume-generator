@@ -1,15 +1,17 @@
 import { ListrTask, ListrTaskWrapper } from 'listr2';
 import { Options } from 'prettier';
 import {
-  getResumeToDocumentConverter,
-  getResumeToPdfConverter,
-} from './convert';
-import { readFile } from 'fs/promises';
-import {
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './descriptor';
-import { getPrettierOptions, validateResumeWithSchema } from './config';
+import {
+  getHtmlRender,
+  getJsonRender,
+  getMarkdownRender,
+  getPdfRender,
+  getPrettierOptions,
+  validateResumeWithSchema,
+} from './config';
 import {
   RenderContextTemplates,
   getExportTasksFromDescriptor,
@@ -18,8 +20,6 @@ import { FileDescriptor } from '../../describe';
 import { getExportTasksForAllResumeVersions } from '.';
 import { ResumeContext, initialContext } from '../../context';
 
-jest.mock('fs/promises');
-jest.mock('./convert');
 jest.mock('./descriptor');
 jest.mock('./config');
 jest.mock('../../export');
@@ -33,19 +33,22 @@ describe('Resume export index', () => {
       newListr: lister,
     };
 
-    const document = jest.fn();
-    const pdf = jest.fn();
+    (getJsonRender as jest.Mock).mockImplementation(async (options) => ({
+      options,
+      render: 'json',
+    }));
+    (getHtmlRender as jest.Mock).mockImplementation(async (options, ctx) => ({
+      options,
+      ctx,
+      render: 'html',
+    }));
+    (getMarkdownRender as jest.Mock).mockImplementation(async (options) => ({
+      options,
+      render: 'markdown',
+    }));
+    (getPdfRender as jest.Mock).mockResolvedValue({ render: 'pdf' });
+    (getPrettierOptions as jest.Mock).mockResolvedValue(prettierOptions);
 
-    (getResumeToDocumentConverter as jest.Mock).mockReturnValue(document);
-    (getResumeToPdfConverter as jest.Mock).mockReturnValue(pdf);
-
-    (readFile as jest.Mock).mockImplementation(
-      async (path: string) =>
-        ({
-          './assets/navbar.html': 'Navbar',
-          './assets/styles.css': 'Styles',
-        }[path] || '')
-    );
     (getPublicVersionDescriptors as jest.Mock).mockReturnValue([
       {
         dir: 'public',
@@ -66,7 +69,7 @@ describe('Resume export index', () => {
         contents: 'bar',
       },
     ]);
-    (getPrettierOptions as jest.Mock).mockResolvedValue(prettierOptions);
+
     (getExportTasksFromDescriptor as jest.Mock).mockImplementation(
       (
         descriptor: FileDescriptor,
@@ -79,26 +82,32 @@ describe('Resume export index', () => {
       })
     );
 
+    const expectedPublicTemplates = {
+      json: {
+        options: prettierOptions,
+        render: 'json',
+      },
+      html: {
+        options: prettierOptions,
+        ctx: { ...initialContext },
+        render: 'html',
+      },
+      md: {
+        options: prettierOptions,
+        render: 'markdown',
+      },
+      pdf: {
+        render: 'pdf',
+      },
+    };
+
     const expectedTasks = [
       {
         title: 'PUBLIC - version: foo, sub: le',
         task: {
           validateFn: validateResumeWithSchema,
           templates: {
-            json: {
-              prettierOptions,
-              preprocessFn: expect.anything(),
-            },
-            html: {
-              templateContents: 'Navbar',
-              templateStyles: 'Styles',
-              prettierOptions: { ...prettierOptions, parser: 'html' },
-              preprocessFn: document,
-            },
-            pdf: {
-              prettierOptions: null,
-              preprocessFn: pdf,
-            },
+            ...expectedPublicTemplates,
           },
           dir: 'public',
           name: 'foo',
@@ -111,20 +120,7 @@ describe('Resume export index', () => {
         task: {
           validateFn: validateResumeWithSchema,
           templates: {
-            json: {
-              prettierOptions,
-              preprocessFn: expect.anything(),
-            },
-            html: {
-              templateContents: 'Navbar',
-              templateStyles: 'Styles',
-              prettierOptions: { ...prettierOptions, parser: 'html' },
-              preprocessFn: document,
-            },
-            pdf: {
-              prettierOptions: null,
-              preprocessFn: pdf,
-            },
+            ...expectedPublicTemplates,
           },
           dir: 'publica',
           name: 'bar',
@@ -137,12 +133,11 @@ describe('Resume export index', () => {
           validateFn: validateResumeWithSchema,
           templates: {
             json: {
-              prettierOptions,
-              preprocessFn: expect.anything(),
+              options: prettierOptions,
+              render: 'json',
             },
             pdf: {
-              prettierOptions: null,
-              preprocessFn: pdf,
+              render: 'pdf',
             },
           },
           dir: 'private',
