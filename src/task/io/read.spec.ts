@@ -1,10 +1,9 @@
 import { readFile } from 'fs/promises';
 import { GithubUserInfo, getCoreUserInfo } from '../../service/github';
-import { ResumeContext, initialContext } from '../context';
 import {
   SRC_RESUME_PATH,
   readGitHub,
-  readPrivateIterations,
+  readPrivateFile,
   readSourceResume,
 } from './read';
 import { parse } from 'yaml';
@@ -18,7 +17,7 @@ jest.mock('../../util/encrypt');
 jest.mock('yaml');
 
 describe('Reading tasks', () => {
-  it('should read GitHub user into context', async () => {
+  it('should read GitHub user and process it into context', async () => {
     const githubUser: GithubUserInfo = {
       user: 'juanmim',
       fullName: 'Juanmi Medina',
@@ -26,117 +25,66 @@ describe('Reading tasks', () => {
       avatarUrl: 'that',
     };
 
-    const context: ResumeContext = { ...initialContext };
+    const context = { foo: 'bar' };
+    const process = jest.fn();
 
     (getCoreUserInfo as jest.Mock).mockResolvedValue({ ...githubUser });
-    const expectedFinalContext = { ...initialContext, githubUser };
 
-    await readGitHub(context);
-    expect(context).toEqual(expectedFinalContext);
+    const task = readGitHub(process);
+
+    await task(context);
+    expect(process).toHaveBeenCalledWith(
+      {
+        ...githubUser,
+      },
+      { foo: 'bar' }
+    );
   });
 
   it('should read and parse source resume into respective areas', async () => {
     const parsed = {
-      basics: {
-        foo: '123',
-        bar: '456',
-      },
-      languages: ['es', 'en'],
-      projects: {
-        todo: {
-          description: 'Test',
-        },
-        calculator: {
-          description: 'Project',
-        },
-      },
-      skills: ['Programming', 'Testing', 'Computers'],
-      work: {
-        dev: {
-          company: 'Foo',
-        },
-        consultant: {
-          company: 'Bar',
-        },
-      },
-      education: {
-        highschool: {
-          startDate: '2018-09-20',
-        },
-      },
+      re: 'la',
+      sa: 'shi',
     };
-
-    const context: ResumeContext = { ...initialContext };
+    const process = jest.fn();
+    const context = { foo: 'bar' };
 
     (readFile as jest.Mock).mockResolvedValue('');
     (parse as jest.Mock).mockReturnValue(parsed);
 
-    const expectedFinalContext = {
-      ...initialContext,
-      incomplete: {
-        basics: {
-          foo: '123',
-          bar: '456',
-        },
-        projects: {
-          todo: {
-            description: 'Test',
-          },
-          calculator: {
-            description: 'Project',
-          },
-        },
+    const task = readSourceResume(process);
+    await task(context);
+    expect(process).toHaveBeenCalledWith(
+      {
+        re: 'la',
+        sa: 'shi',
       },
-      complete: {
-        languages: ['es', 'en'],
-        skills: ['Programming', 'Testing', 'Computers'],
-        work: {
-          dev: {
-            company: 'Foo',
-          },
-          consultant: {
-            company: 'Bar',
-          },
-        },
-        education: {
-          highschool: {
-            startDate: '2018-09-20',
-          },
-        },
-      },
-    };
-
-    await readSourceResume(context);
-    expect(context).toEqual(expectedFinalContext);
+      { foo: 'bar' }
+    );
 
     expect(readFile).toHaveBeenCalledWith(SRC_RESUME_PATH, 'utf-8');
     expect(parse).toHaveBeenCalledWith('');
   });
 
   it('should read and decrypt private iterations into context', async () => {
+    const processFn = jest.fn();
     const encrypted: EncryptedData = {
       initVector: 'foo',
       data: 'bar',
       authTag: 'baz',
     };
 
-    const iterations = [{ foo: 'test' }, { bar: 'make' }];
     process.env['PRIVATE_FILE_ID'] = 'my-private-file-here';
 
     (getFileContents as jest.Mock).mockResolvedValue(encrypted);
-    (decryptText as jest.Mock).mockReturnValue('');
-    (parse as jest.Mock).mockReturnValue(iterations);
+    (decryptText as jest.Mock).mockReturnValue('Decrypted');
 
-    const context: ResumeContext = { ...initialContext };
-    const expectedFinalContext: ResumeContext = {
-      ...initialContext,
-      privateIterations: [{ foo: 'test' }, { bar: 'make' }],
-    };
+    const context = { foo: 'bar' };
 
-    await readPrivateIterations(context);
-    expect(context).toEqual(expectedFinalContext);
+    const task = readPrivateFile(processFn);
+    await task(context);
 
-    expect(parse).toHaveBeenCalledWith('');
+    expect(processFn).toHaveBeenCalledWith('Decrypted', { foo: 'bar' });
     expect(decryptText).toHaveBeenCalledWith(encrypted);
     expect(getFileContents).toHaveBeenCalledWith('my-private-file-here');
   });
