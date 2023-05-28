@@ -3,7 +3,7 @@ import { extractKey } from '../mapping/extract';
 import { LocalisedObject } from '../mapping/locale.types';
 import { patchObject } from '../mapping/patch';
 import { GithubUserInfo } from '../service/github';
-import { Renderable, generateFromTemplate } from '../util/render/navbar';
+import { LanguageLink, generateFromTemplate } from '../util/render/navbar';
 import {
   addGitHubInfoToBasics,
   getDekeyedSectionFromObject,
@@ -218,7 +218,7 @@ describe('Public version generation', () => {
       locales: { en: {}, es: {}, fr: {} },
     };
 
-    const expectedRenderables: Renderable[] = [
+    const expectedRenderables: LanguageLink[] = [
       { code: 'en', label: 'English', selected: false },
       { code: 'es', label: 'Español', selected: true },
       { code: 'fr', label: 'Français', selected: false },

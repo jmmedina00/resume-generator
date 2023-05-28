@@ -1,19 +1,13 @@
-<nav class="additional-navigation">
-  <ul>
+<nav class="additional-navigation" aria-label="Go to">
+  <ul aria-label="Download">
+    <!-- Transfer labels to code -->
+    {{#formats}}
     <li>
-      <a href="resume.pdf" class="bi-download"></a>
+      <a href="{{href}}" class="bi-{{icon}}" aria-label="{{label}}"></a>
     </li>
-    <li>
-      <a href="resume.md.html" class="bi-markdown-fill"></a>
-    </li>
-    <li>
-      <a href="resume.md" class="bi-markdown"></a>
-    </li>
-    <li>
-      <a href="resume.json" class="bi-braces"></a>
-    </li>
+    {{/formats}}
   </ul>
-  <ul>
+  <ul aria-label="Language">
     {{#items}}
     <li>
       {{^selected}}<a href="../{{code}}" class="active"

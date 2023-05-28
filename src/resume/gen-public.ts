@@ -5,7 +5,7 @@ import { dekeyObject } from '../mapping/dekey';
 import { extractKey } from '../mapping/extract';
 import { LocalisedObject } from '../mapping/locale.types';
 import { patchObject } from '../mapping/patch';
-import { Renderable, generateFromTemplate } from '../util/render/navbar';
+import { LanguageLink, generateFromTemplate } from '../util/render/navbar';
 import langmap from 'langmap';
 
 export const addGitHubInfoToBasics = async (
@@ -65,7 +65,7 @@ export const getNavigationBar = (
   { locales }: LocalisedObject,
   activeCode: string
 ) => {
-  const items: Renderable[] = Object.keys(locales).map((code) => ({
+  const items: LanguageLink[] = Object.keys(locales).map((code) => ({
     code,
     label: langmap[code].nativeName,
     selected: code === activeCode,
