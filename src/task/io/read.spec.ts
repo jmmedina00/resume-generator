@@ -1,12 +1,6 @@
 import { readFile } from 'fs/promises';
 import { GithubUserInfo, getCoreUserInfo } from '../../service/github';
-import {
-  SRC_RESUME_PATH,
-  readGitHub,
-  readPrivateFile,
-  readSourceResume,
-} from './read';
-import { parse } from 'yaml';
+import { readGitHub, readPrivateFile, readLocalFile } from './read';
 import { getFileContents } from '../../service/gdrive';
 import { EncryptedData, decryptText } from '../../util/encrypt';
 
@@ -14,7 +8,6 @@ jest.mock('fs/promises');
 jest.mock('../../service/github');
 jest.mock('../../service/gdrive');
 jest.mock('../../util/encrypt');
-jest.mock('yaml');
 
 describe('Reading tasks', () => {
   it('should read GitHub user and process it into context', async () => {
@@ -41,29 +34,17 @@ describe('Reading tasks', () => {
     );
   });
 
-  it('should read and parse source resume into respective areas', async () => {
-    const parsed = {
-      re: 'la',
-      sa: 'shi',
-    };
+  it('should read file and get it processed', async () => {
     const process = jest.fn();
     const context = { foo: 'bar' };
 
-    (readFile as jest.Mock).mockResolvedValue('');
-    (parse as jest.Mock).mockReturnValue(parsed);
+    (readFile as jest.Mock).mockResolvedValue('Foo bar baz');
 
-    const task = readSourceResume(process);
+    const task = readLocalFile(process, './file.txt');
     await task(context);
-    expect(process).toHaveBeenCalledWith(
-      {
-        re: 'la',
-        sa: 'shi',
-      },
-      { foo: 'bar' }
-    );
 
-    expect(readFile).toHaveBeenCalledWith(SRC_RESUME_PATH, 'utf-8');
-    expect(parse).toHaveBeenCalledWith('');
+    expect(process).toHaveBeenCalledWith('Foo bar baz', { foo: 'bar' });
+    expect(readFile).toHaveBeenCalledWith('./file.txt', 'utf-8');
   });
 
   it('should read and decrypt private iterations into context', async () => {

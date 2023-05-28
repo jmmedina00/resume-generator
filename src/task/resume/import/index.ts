@@ -3,13 +3,15 @@ import { ResumeContext } from '../../context';
 import { deleteFolder } from '../../io/write';
 import { clearDriveFolder } from '../../io/upload';
 import { isThisCI } from '../..';
-import { readGitHub, readPrivateFile, readSourceResume } from '../../io/read';
+import { readGitHub, readPrivateFile, readLocalFile } from '../../io/read';
 import {
   addResumePartsToTheirCorrectPlaces,
   parsePrivateIterations,
   setGitHubUserInfo,
 } from './processor';
 import { basename } from 'path';
+
+export const SRC_RESUME_PATH = './resume.yml';
 
 const getFolderDeletionTask = (path: string) => ({
   title: `Delete ${basename(path)} folder (if any)`,
@@ -32,7 +34,10 @@ export const getResumeLoadingTasks = (
       { title: 'Read GitHub', task: readGitHub(setGitHubUserInfo) },
       {
         title: 'Read source resume',
-        task: readSourceResume(addResumePartsToTheirCorrectPlaces),
+        task: readLocalFile(
+          addResumePartsToTheirCorrectPlaces,
+          SRC_RESUME_PATH
+        ),
       },
       { title: 'Read private', task: readPrivateFile(parsePrivateIterations) },
     ],

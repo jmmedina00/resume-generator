@@ -12,9 +12,10 @@ export const setGitHubUserInfo: Processor<ResumeContext, GithubUserInfo> = (
 
 export const addResumePartsToTheirCorrectPlaces: Processor<
   ResumeContext,
-  any
+  string
 > = (resume, context) => {
-  const { basics, languages, projects, skills, work, education } = resume;
+  const { basics, languages, projects, skills, work, education } =
+    parse(resume);
 
   context.incomplete = { basics, projects };
   context.complete = { languages, skills, work, education };

@@ -1,10 +1,7 @@
 import { readFile } from 'fs/promises';
 import { GithubUserInfo, getCoreUserInfo } from '../../service/github';
-import { parse } from 'yaml';
 import { EncryptedData, decryptText } from '../../util/encrypt';
 import { getFileContents } from '../../service/gdrive';
-
-export const SRC_RESUME_PATH = './resume.yml';
 
 export type Processor<C, D> = (data: D, context: C) => void;
 
@@ -15,13 +12,12 @@ export const readGitHub =
     process(gitHubUser, ctx);
   };
 
-export const readSourceResume =
-  <T>(process: Processor<T, any>) =>
+export const readLocalFile =
+  <T>(process: Processor<T, string>, path: string) =>
   async (ctx: T): Promise<void> => {
-    const resumeFile = await readFile(SRC_RESUME_PATH, 'utf-8');
-    const resume: any = parse(resumeFile);
+    const resumeFile = await readFile(path, 'utf-8');
 
-    process(resume, ctx);
+    process(resumeFile, ctx);
   };
 
 export const readPrivateFile =

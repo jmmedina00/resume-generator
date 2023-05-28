@@ -61,14 +61,14 @@ describe('Data to resume context processors', () => {
       },
     };
 
-    const parsed = {
+    (parse as jest.Mock).mockReturnValue({
       basics,
       languages,
       projects,
       skills,
       work,
       education,
-    };
+    });
 
     const expectedFinalContext = {
       ...initialContext,
@@ -84,8 +84,9 @@ describe('Data to resume context processors', () => {
       },
     };
 
-    addResumePartsToTheirCorrectPlaces(parsed, context);
+    addResumePartsToTheirCorrectPlaces('resume', context);
     expect(context).toEqual(expectedFinalContext);
+    expect(parse).toHaveBeenCalledWith('resume');
   });
 
   it('should parse private YAML file contents into private iterations', () => {

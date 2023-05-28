@@ -1,6 +1,6 @@
 import { ListrTaskWrapper } from 'listr2';
 import { isThisCI } from '../..';
-import { readGitHub, readPrivateFile, readSourceResume } from '../../io/read';
+import { readGitHub, readPrivateFile, readLocalFile } from '../../io/read';
 import { clearDriveFolder } from '../../io/upload';
 import { deleteFolder } from '../../io/write';
 import {
@@ -9,7 +9,7 @@ import {
   setGitHubUserInfo,
 } from './processor';
 import { ResumeContext, initialContext } from '../../context';
-import { getResumeLoadingTasks } from '.';
+import { SRC_RESUME_PATH, getResumeLoadingTasks } from '.';
 
 jest.mock('../../io/write');
 jest.mock('../../io/read');
@@ -32,8 +32,9 @@ describe('Resume importing tasks', () => {
       do: 'github',
     }));
 
-    (readSourceResume as jest.Mock).mockImplementation((process) => ({
+    (readLocalFile as jest.Mock).mockImplementation((process, path) => ({
       process,
+      path,
       do: 'source',
     }));
 
@@ -62,7 +63,11 @@ describe('Resume importing tasks', () => {
       },
       {
         title: 'Read source resume',
-        task: { process: addResumePartsToTheirCorrectPlaces, do: 'source' },
+        task: {
+          process: addResumePartsToTheirCorrectPlaces,
+          do: 'source',
+          path: SRC_RESUME_PATH,
+        },
       },
       {
         title: 'Read private',
