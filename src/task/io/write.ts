@@ -16,6 +16,10 @@ export const deleteFolder = (path: string) => async () => {
   await rm(path, { recursive: true, force: true });
 };
 
+export const deleteFile = (path: string) => async () => {
+  await rm(path);
+};
+
 export const copyFileToFolder = (from: string, to: string) => async () => {
   const file = await readFile(from);
 

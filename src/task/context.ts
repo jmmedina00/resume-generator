@@ -36,6 +36,11 @@ export interface RenderWithTemplateContext extends RenderContext {
   activePage: string;
 }
 
+export interface RedactContext {
+  localState: string;
+  remoteState: string;
+}
+
 export const initialContext: ResumeContext = {
   githubUser: {
     user: '',

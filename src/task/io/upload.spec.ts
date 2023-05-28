@@ -1,6 +1,14 @@
 import { readdirSync } from 'fs';
-import { clearDriveFolder, uploadFolderToDrive } from './upload';
-import { removeAllFilesFromFolder, uploadFile } from '../../service/gdrive';
+import {
+  clearDriveFolder,
+  updatePrivateFile,
+  uploadFolderToDrive,
+} from './upload';
+import {
+  removeAllFilesFromFolder,
+  updateFile,
+  uploadFile,
+} from '../../service/gdrive';
 import { initialContext } from '../context';
 import { ListrTaskWrapper } from 'listr2';
 
@@ -51,6 +59,18 @@ describe('Uploading tasks', () => {
     for (const expectedPath of expectedPaths) {
       expect(uploadFile).toHaveBeenCalledWith(expectedPath);
     }
+  });
+
+  it('should wrap around update Drive file with private file id', async () => {
+    process.env['PRIVATE_FILE_ID'] = 'file_id_goes_here';
+
+    const task = updatePrivateFile('./private.result');
+    await task();
+
+    expect(updateFile).toHaveBeenCalledWith(
+      'file_id_goes_here',
+      './private.result'
+    );
   });
 
   it('should wrap around remove all files from Drive folder', async () => {

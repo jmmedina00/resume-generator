@@ -1,6 +1,7 @@
 import { format } from 'path';
 import {
   removeAllFilesFromFolder,
+  updateFile,
   uploadFile as uploadFileToDrive,
 } from '../../service/gdrive';
 import { readdirSync } from 'fs';
@@ -14,6 +15,11 @@ export const uploadFolderToDrive = (path: string): ListrTask<any, any>[] => {
       await uploadFileToDrive(file);
     },
   }));
+};
+
+export const updatePrivateFile = (path: string) => async () => {
+  const fileId = process.env['PRIVATE_FILE_ID'] || '';
+  await updateFile(fileId, path);
 };
 
 export const clearDriveFolder = async () => {
