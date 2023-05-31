@@ -1,4 +1,3 @@
-import { beforeEach } from 'node:test';
 import {
   RenderContext,
   RenderWithTemplateContext,
@@ -12,10 +11,11 @@ import {
 } from './convert';
 import puppeteer from 'puppeteer';
 import { getNavigationBar } from '../../../resume/gen-public';
-import { addAtBodyTop, addStyles } from '../../../util/render';
+import { addAtBodyBottom, addAtBodyTop, addStyles } from '../../../util/render';
 import { LocalisedObject } from '../../../mapping/locale.types';
 import { render } from 'mustache';
 import { readFile } from 'fs/promises';
+import { getPagesLinkFromRepo } from '../../../service/github/util';
 
 jest.mock('jsonresume-theme-foo', () => ({
   render: jest.fn().mockReturnValue('This is good'),
@@ -43,6 +43,7 @@ jest.mock('puppeteer', () => {
   return { launch, browser, pdf, setContent };
 });
 
+jest.mock('../../../service/github/util');
 jest.mock('../../../resume/gen-public');
 jest.mock('../../../util/render');
 jest.mock('fs/promises');
@@ -138,19 +139,31 @@ describe('Resume to document conversion', () => {
     );
   });
 
-  it('should replace JSON contents with PDF generated with Puppeteer', async () => {
-    const context: RenderContext = {
+  it('should replace JSON contents with PDF with footer generated with Puppeteer', async () => {
+    process.env['GITHUB_REPOSITORY'] = 'repo_from_actions_here';
+    (render as jest.Mock).mockReturnValue('Thingy');
+    (getPagesLinkFromRepo as jest.Mock).mockReturnValue('mylink');
+    (addAtBodyBottom as jest.Mock).mockReturnValue('Bottomed');
+    (addStyles as jest.Mock).mockReturnValue('Stylish');
+
+    const context: RenderWithTemplateContext = {
       contents: Buffer.from(JSON.stringify({ foo: 'foo', bar: 'bar' })),
       path: '',
       prettierOptions: {},
       preprocessFn: jest.fn(), //This is where this feat would go
+      activePage: '',
+      templateContents: 'template',
+      templateStyles: 'styles',
     };
 
-    const expectedContext: RenderContext = {
+    const expectedContext: RenderWithTemplateContext = {
       contents: Buffer.from('Moñeco'),
       path: '',
       prettierOptions: {},
       preprocessFn: expect.anything(),
+      activePage: '',
+      templateContents: 'template',
+      templateStyles: 'styles',
     };
 
     const converter = getResumeToPdfConverter('foo');
@@ -164,13 +177,76 @@ describe('Resume to document conversion', () => {
     expect(moduleFoo.render).toHaveBeenCalledWith({ foo: 'foo', bar: 'bar' });
     expect(moduleBar.render).not.toHaveBeenCalled();
 
+    expect(getPagesLinkFromRepo).toHaveBeenCalledWith('repo_from_actions_here');
+    expect(render).toHaveBeenCalledWith('template', { resumeLink: 'mylink' });
+    expect(addAtBodyBottom).toHaveBeenCalledWith('This is good', 'Thingy');
+    expect(addStyles).toHaveBeenCalledWith('Bottomed', 'styles');
+
     expect(puppeteer.launch).toHaveBeenCalledWith({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     expect((puppeteer as any).browser.newPage).toHaveBeenCalled();
     expect((puppeteer as any).browser.close).toHaveBeenCalled();
-    expect((puppeteer as any).setContent).toHaveBeenCalledWith('This is good', {
+    expect((puppeteer as any).setContent).toHaveBeenCalledWith('Stylish', {
+      waitUntil: 'networkidle0',
+    });
+    expect((puppeteer as any).pdf).toHaveBeenCalledWith({
+      format: 'a4',
+      printBackground: true,
+    });
+  });
+
+  it('should replace JSON contents with PDF with no footer generated with Puppeteer', async () => {
+    process.env['GITHUB_REPOSITORY'] = '';
+    (render as jest.Mock).mockClear().mockReturnValue('BAd thing');
+    (getPagesLinkFromRepo as jest.Mock).mockReturnValue('');
+    (addAtBodyBottom as jest.Mock).mockReturnValue('Bottomed');
+    (addStyles as jest.Mock).mockReturnValue('Stylish');
+
+    const context: RenderWithTemplateContext = {
+      contents: Buffer.from(JSON.stringify({ foo: 'foo', bar: 'bar' })),
+      path: '',
+      prettierOptions: {},
+      preprocessFn: jest.fn(), //This is where this feat would go
+      activePage: '',
+      templateContents: 'template',
+      templateStyles: 'styles',
+    };
+
+    const expectedContext: RenderWithTemplateContext = {
+      contents: Buffer.from('Moñeco'),
+      path: '',
+      prettierOptions: {},
+      preprocessFn: expect.anything(),
+      activePage: '',
+      templateContents: 'template',
+      templateStyles: 'styles',
+    };
+
+    const converter = getResumeToPdfConverter('foo');
+    await converter(context);
+
+    expect(context).toEqual(expectedContext);
+
+    const moduleFoo = require('jsonresume-theme-foo');
+    const moduleBar = require('jsonresume-theme-bar');
+
+    expect(moduleFoo.render).toHaveBeenCalledWith({ foo: 'foo', bar: 'bar' });
+    expect(moduleBar.render).not.toHaveBeenCalled();
+
+    expect(getPagesLinkFromRepo).toHaveBeenCalledWith('');
+    expect(render).not.toHaveBeenCalled();
+    expect(addAtBodyBottom).toHaveBeenCalledWith('This is good', '');
+    expect(addStyles).toHaveBeenCalledWith('Bottomed', 'styles');
+
+    expect(puppeteer.launch).toHaveBeenCalledWith({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    expect((puppeteer as any).browser.newPage).toHaveBeenCalled();
+    expect((puppeteer as any).browser.close).toHaveBeenCalled();
+    expect((puppeteer as any).setContent).toHaveBeenCalledWith('Stylish', {
       waitUntil: 'networkidle0',
     });
     expect((puppeteer as any).pdf).toHaveBeenCalledWith({

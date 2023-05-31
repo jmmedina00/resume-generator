@@ -2,7 +2,7 @@ import { Options, resolveConfig } from 'prettier';
 import { RenderContext, ResumeContext, initialContext } from '../../context';
 import {
   PATH_MARKDOWN_TEMPLATE,
-  PATH_NAVBAR_STYLES,
+  PATH_STYLES,
   PATH_NAVBAR_TEMPLATE,
   THEME_HTML,
   THEME_PDF,
@@ -12,6 +12,7 @@ import {
   getPdfRender,
   getPrettierOptions,
   validateResumeWithSchema,
+  PATH_FOOTER_TEMPLATE,
 } from './config';
 import {
   getResumeToDocumentConverter,
@@ -74,11 +75,14 @@ describe('Resume rendering config', () => {
     (getResumeToPdfConverter as jest.Mock).mockImplementation((theme) => ({
       theme,
     }));
+    (readFile as jest.Mock).mockImplementation(async (file) => file);
 
     const render = await getPdfRender();
     expect(render).toEqual({
       prettierOptions: null,
       preprocessFn: { theme: THEME_PDF },
+      templateContents: PATH_FOOTER_TEMPLATE,
+      templateStyles: PATH_STYLES,
     });
   });
 
@@ -100,7 +104,7 @@ describe('Resume rendering config', () => {
     const resumeContext: ResumeContext = { ...initialContext };
 
     (readFile as jest.Mock).mockImplementation((path) => {
-      if (path === PATH_NAVBAR_STYLES) return 'styles';
+      if (path === PATH_STYLES) return 'styles';
       if (path === PATH_NAVBAR_TEMPLATE) return 'template';
       return '';
     });

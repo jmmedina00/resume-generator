@@ -15,7 +15,8 @@ export const THEME_HTML = 'even';
 export const THEME_PDF = 'spartacus';
 export const PATH_MARKDOWN_TEMPLATE = './assets/resume.md';
 export const PATH_NAVBAR_TEMPLATE = './assets/navbar.html';
-export const PATH_NAVBAR_STYLES = './assets/styles.css';
+export const PATH_FOOTER_TEMPLATE = './assets/footer.html';
+export const PATH_STYLES = './assets/styles.css';
 
 export const getPrettierOptions = async (): Promise<Options> =>
   (await resolveConfig('.prettierrc')) || {};
@@ -37,10 +38,17 @@ export const getJsonRender = async (
 
 export const getPdfRender = async (): Promise<
   RenderContextTemplates[string]
-> => ({
-  prettierOptions: null as unknown as Options,
-  preprocessFn: getResumeToPdfConverter(THEME_PDF),
-});
+> => {
+  const templateContents = await readFile(PATH_FOOTER_TEMPLATE, 'utf-8');
+  const templateStyles = await readFile(PATH_STYLES, 'utf-8');
+
+  return {
+    templateContents,
+    templateStyles,
+    prettierOptions: null as unknown as Options,
+    preprocessFn: getResumeToPdfConverter(THEME_PDF),
+  };
+};
 
 export const getMarkdownRender = async (
   prettierOptions: Options
@@ -57,7 +65,7 @@ export const getHtmlRender = async (
   context: ResumeContext
 ): Promise<RenderContextTemplates[string]> => {
   const templateContents = await readFile(PATH_NAVBAR_TEMPLATE, 'utf-8');
-  const templateStyles = await readFile(PATH_NAVBAR_STYLES, 'utf-8');
+  const templateStyles = await readFile(PATH_STYLES, 'utf-8');
 
   return {
     templateContents,

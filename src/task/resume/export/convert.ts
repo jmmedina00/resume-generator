@@ -1,6 +1,6 @@
 import { render } from 'mustache';
 import { getNavigationBar } from '../../../resume/gen-public';
-import { addAtBodyTop, addStyles } from '../../../util/render';
+import { addAtBodyBottom, addAtBodyTop, addStyles } from '../../../util/render';
 import {
   RenderContext,
   RenderWithTemplateContext,
@@ -8,6 +8,7 @@ import {
 } from '../../context';
 import puppeteer from 'puppeteer';
 import { readFile } from 'fs/promises';
+import { getPagesLinkFromRepo } from '../../../service/github/util';
 
 const getTheme = (themeModule: string) => 'jsonresume-theme-' + themeModule;
 
@@ -44,11 +45,20 @@ export const getResumeToDocumentConverter =
 
 export const getResumeToPdfConverter =
   (themeModule: string) =>
-  async (ctx: RenderContext): Promise<void> => {
+  async (ctx: RenderWithTemplateContext): Promise<void> => {
     const resume = JSON.parse(ctx.contents.toString());
     const theme = require(getTheme(themeModule));
 
     const rendered = theme.render(resume);
+
+    const footerTemplate = ctx.templateContents || '';
+    const repoName = process.env['GITHUB_REPOSITORY'] || '';
+
+    const resumeLink = getPagesLinkFromRepo(repoName);
+    const footer = !!resumeLink ? render(footerTemplate, { resumeLink }) : '';
+
+    const withFooter = addAtBodyBottom(rendered, footer);
+    const fullyStyled = addStyles(withFooter, ctx.templateStyles || '');
 
     const browser = await puppeteer.launch({
       headless: 'new',
@@ -56,7 +66,7 @@ export const getResumeToPdfConverter =
     });
     const page = await browser.newPage();
 
-    await page.setContent(rendered, { waitUntil: 'networkidle0' });
+    await page.setContent(fullyStyled, { waitUntil: 'networkidle0' });
     const buffer = await page.pdf({ format: 'a4', printBackground: true });
     ctx.contents = buffer;
 
