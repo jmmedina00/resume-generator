@@ -10,11 +10,18 @@ import {
   setGitHubUserInfo,
 } from './processor';
 import { basename } from 'path';
+import { getFullTaskName } from '../../io/task';
 
 export const SRC_RESUME_PATH = './resume.yml';
 
-const getFolderDeletionTask = (path: string) => ({
-  title: `Delete ${basename(path)} folder (if any)`,
+const folderDeleteTitle = (path: string) =>
+  `Delete ${basename(path)} folder (if any)`;
+
+const getFolderDeletionTask = (
+  path: string,
+  task: ListrTaskWrapper<ResumeContext, any>
+) => ({
+  title: getFullTaskName(folderDeleteTitle(path), task),
   task: deleteFolder(path),
 });
 
@@ -24,22 +31,28 @@ export const getResumeLoadingTasks = (
 ) =>
   task.newListr(
     [
-      getFolderDeletionTask('./private'),
-      getFolderDeletionTask('./public'),
+      getFolderDeletionTask('./private', task),
+      getFolderDeletionTask('./public', task),
       {
-        title: 'Clear Drive folder',
+        title: getFullTaskName('Clear Drive folder', task),
         task: clearDriveFolder,
         enabled: isThisCI,
       },
-      { title: 'Read GitHub', task: readGitHub(setGitHubUserInfo) },
       {
-        title: 'Read source resume',
+        title: getFullTaskName('Read GitHub', task),
+        task: readGitHub(setGitHubUserInfo),
+      },
+      {
+        title: getFullTaskName('Read source resume', task),
         task: readLocalFile(
           addResumePartsToTheirCorrectPlaces,
           SRC_RESUME_PATH
         ),
       },
-      { title: 'Read private', task: readPrivateFile(parsePrivateIterations) },
+      {
+        title: getFullTaskName('Read private', task),
+        task: readPrivateFile(parsePrivateIterations),
+      },
     ],
     {
       concurrent: true,

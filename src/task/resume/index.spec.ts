@@ -19,6 +19,7 @@ import {
 } from '../../resume/gen-public';
 
 jest.mock('./public');
+jest.mock('../io/task');
 
 describe('Resume index', () => {
   it('should produce public resume creation tasks', () => {

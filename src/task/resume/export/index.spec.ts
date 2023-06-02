@@ -23,6 +23,7 @@ import { ResumeContext, initialContext } from '../../context';
 jest.mock('./descriptor');
 jest.mock('./config');
 jest.mock('../../export');
+jest.mock('../../io/task');
 
 describe('Resume export index', () => {
   it('should consolidate descriptors and config into list of export tasks', async () => {

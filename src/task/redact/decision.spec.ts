@@ -7,6 +7,7 @@ import {
 import { getRedactFileSyncTasks } from './write';
 
 jest.mock('./write');
+jest.mock('../io/task');
 
 describe('Redact context decision', () => {
   it('should do "nothing" when states are equal', () => {

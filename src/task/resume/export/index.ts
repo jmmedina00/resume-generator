@@ -17,6 +17,7 @@ import {
   RenderContextTemplates,
   getExportTasksFromDescriptor,
 } from '../../export';
+import { getFullTaskName } from '../../io/task';
 
 const namer = ({ name, subversion }: FileDescriptor) =>
   `version: ${name}` + (!subversion ? '' : `, sub: ${subversion}`);
@@ -24,9 +25,13 @@ const keywordedNamer = (keyword: string) => (descriptor: FileDescriptor) =>
   [keyword, namer(descriptor)].join(' - ');
 
 const generateTasks =
-  (keyword: string, templates: RenderContextTemplates) =>
+  (
+    keyword: string,
+    templates: RenderContextTemplates,
+    task: ListrTaskWrapper<ResumeContext, any>
+  ) =>
   (descriptor: FileDescriptor): ListrTask<any, any> => ({
-    title: keywordedNamer(keyword)(descriptor),
+    title: getFullTaskName(keywordedNamer(keyword)(descriptor), task),
     task: getExportTasksFromDescriptor(
       descriptor,
       templates,
@@ -48,11 +53,11 @@ export const getExportTasksForAllResumeVersions = async (
   const pdf = await getPdfRender();
 
   const publicTasks = publicDescriptors.map(
-    generateTasks('PUBLIC', { json, html, md, pdf })
+    generateTasks('PUBLIC', { json, html, md, pdf }, task)
   );
 
   const privateTasks = privateDescriptors.map(
-    generateTasks('PRIVATE', { json, pdf })
+    generateTasks('PRIVATE', { json, pdf }, task)
   );
 
   return task.newListr([...publicTasks, ...privateTasks], { concurrent: true });

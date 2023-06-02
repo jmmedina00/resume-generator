@@ -11,6 +11,7 @@ jest.mock('../resume/export/config');
 jest.mock('../../util/io');
 jest.mock('../render');
 jest.mock('fs/promises');
+jest.mock('../io/task');
 
 describe('Markdown rendering tasks', () => {
   it('should be generated according to files present in folder', async () => {

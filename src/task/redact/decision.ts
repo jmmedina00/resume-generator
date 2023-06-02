@@ -1,8 +1,9 @@
 import { ListrTaskWrapper } from 'listr2';
 import { RedactContext } from '../context';
 import { getRedactFileSyncTasks } from './write';
+import { getFullTaskName } from '../io/task';
 
-export const STATES_EQUAL = 'States are equal. No action required'
+export const STATES_EQUAL = 'States are equal. No action required';
 
 export const evaluateContextAndDetermineNextAction = (
   ctx: RedactContext,
@@ -14,11 +15,11 @@ export const evaluateContextAndDetermineNextAction = (
     localState === remoteState
       ? [
           {
-            title: STATES_EQUAL,
+            title: getFullTaskName(STATES_EQUAL, task),
             task: async () => {},
           },
         ]
-      : getRedactFileSyncTasks();
+      : getRedactFileSyncTasks(); // TODO refactor this to take taskr params
 
   return task.newListr(tasks);
 };

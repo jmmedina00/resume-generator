@@ -13,6 +13,7 @@ import { SRC_RESUME_PATH, getResumeLoadingTasks } from '.';
 
 jest.mock('../../io/write');
 jest.mock('../../io/read');
+jest.mock('../../io/task');
 
 describe('Resume importing tasks', () => {
   it('should provided all tasks according to resume needs', () => {

@@ -7,6 +7,7 @@ import { Options } from 'prettier';
 import { getPrettierOptions } from '../resume/export/config';
 import { getRenderingTasks } from '../render';
 import { readFile } from 'fs/promises';
+import { getFullTaskName } from '../io/task';
 
 const getRenderContext = async (
   path: string,
@@ -26,7 +27,7 @@ export const getMarkdownRenderingTasks =
     const tasks = files
       .filter((file) => extname(file) === '.md')
       .map(async (file) => ({
-        title: file,
+        title: getFullTaskName(file, task),
         task: getRenderingTasks(await getRenderContext(file, prettierOptions)),
       }));
 

@@ -10,6 +10,7 @@ import {
   addGitHubInfoToBasics,
   getProperProjects,
 } from '../../resume/gen-public';
+import { getFullTaskName } from '../io/task';
 
 export const TASK_COMPLETE_BASICS = 'Complete basics';
 export const TASK_COMPLETE_PROJECTS = 'Complete projects';
@@ -24,27 +25,27 @@ export const getPublicResumeCreationTasks = (
 ): Listr<ResumeContext> =>
   task.newListr([
     {
-      title: TASK_COMPLETE_BASICS,
+      title: getFullTaskName(TASK_COMPLETE_BASICS, task),
       task: transformIncompleteField('basics', addGitHubInfoToBasics),
     },
     {
-      title: TASK_COMPLETE_PROJECTS,
+      title: getFullTaskName(TASK_COMPLETE_PROJECTS, task),
       task: transformIncompleteField('projects', getProperProjects),
     },
     {
-      title: TASK_LOCALES,
+      title: getFullTaskName(TASK_LOCALES, task),
       task: transformCompleteToLocalised,
     },
     {
-      title: TASK_TRANSLATE,
+      title: getFullTaskName(TASK_TRANSLATE, task),
       task: transformLocalisedToTranslated,
     },
     {
-      title: TASK_DEKEY_WORK,
+      title: getFullTaskName(TASK_DEKEY_WORK, task),
       task: transformAndReplaceLocalisedField('work', ['position', 'summary']),
     },
     {
-      title: TASK_DEKEY_EDUCATION,
+      title: getFullTaskName(TASK_DEKEY_EDUCATION, task),
       task: transformAndReplaceLocalisedField('education', [
         'area',
         'studyType',

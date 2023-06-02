@@ -17,6 +17,7 @@ import { ListrTaskFn } from 'listr2';
 
 jest.mock('./render');
 jest.mock('./describe');
+jest.mock('./io/task');
 
 describe('Exporting tasks', () => {
   it('should create writing tasks from file descriptor, context templates and validation task', async () => {

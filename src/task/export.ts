@@ -7,6 +7,7 @@ import {
 import { getRenderingTasks } from './render';
 import { FileDescriptor, getDescribedPath } from './describe';
 import { Options } from 'prettier';
+import { getFullTaskName } from './io/task';
 
 export const PUBLIC_DIST = './public';
 export const PRIVATE_DIST = './private';
@@ -44,18 +45,21 @@ export const getExportTasksFromDescriptor =
           contents,
           path: getDescribedPath(descriptor, format),
         };
-        return { title: format, task: getRenderingTasks(context) };
+        return {
+          title: getFullTaskName(format, task),
+          task: getRenderingTasks(context),
+        };
       }
     );
 
     return task.newListr<RenderContext>(
       [
         {
-          title: TASK_VALIDATE,
+          title: getFullTaskName(TASK_VALIDATE, task),
           task: validateFn,
         },
         {
-          title: TASK_EXPORT,
+          title: getFullTaskName(TASK_EXPORT, task),
           task: (_, task) => task.newListr(exportTasks),
         },
       ],
