@@ -63,5 +63,6 @@ describe('Redact context decision', () => {
     expect(lister).toHaveBeenCalledWith([
       { title: 'Sync files', task: expect.anything() },
     ]);
+    expect(getRedactFileSyncTasks).toHaveBeenCalledWith(providedTask);
   });
 });

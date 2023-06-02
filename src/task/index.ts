@@ -36,12 +36,11 @@ export const tasks = new Listr<ResumeContext>(
       title: 'Make web versions of Markdown files',
       task: getMarkdownRenderingTasks('./public'),
     },
-    /* {
+    {
       title: 'Upload entire private folder to Drive',
-      task: (_, task) =>
-        task.newListr(uploadFolderToDrive('./private'), { concurrent: true }),
-      enabled: isThisCI, // TODO - refactor this into task.newListr
-    }, */
+      task: uploadFolderToDrive('./private'),
+      enabled: isThisCI,
+    },
   ],
   {
     collectErrors: 'minimal',

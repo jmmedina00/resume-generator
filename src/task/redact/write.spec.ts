@@ -1,3 +1,4 @@
+import { ListrTaskWrapper } from 'listr2';
 import { encryptText } from '../../util/encrypt';
 import { RedactContext } from '../context';
 import { updatePrivateFile } from '../io/upload';
@@ -7,6 +8,7 @@ import { DEST_LOCAL_ENCRYPTED, getRedactFileSyncTasks } from './write';
 jest.mock('../../util/encrypt');
 jest.mock('../io/upload');
 jest.mock('../io/write');
+jest.mock('../io/task');
 
 describe('Redact writing', () => {
   it('should generate appropriate sync tasks', () => {
@@ -51,7 +53,9 @@ describe('Redact writing', () => {
       },
     ];
 
-    const actualTasks = getRedactFileSyncTasks();
+    const actualTasks = getRedactFileSyncTasks(
+      {} as ListrTaskWrapper<any, any>
+    );
     expect(actualTasks).toEqual(expectedTasks);
 
     const writeTask = actualTasks.find(

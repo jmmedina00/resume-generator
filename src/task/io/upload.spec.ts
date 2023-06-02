@@ -10,16 +10,18 @@ import {
   uploadFile,
 } from '../../service/gdrive';
 import { initialContext } from '../context';
-import { ListrTaskWrapper } from 'listr2';
+import { ListrTask, ListrTaskWrapper } from 'listr2';
 
 jest.mock('fs');
+jest.mock('./task');
 jest.mock('../../service/gdrive');
 
 describe('Uploading tasks', () => {
   it('should create tasks and upload each file separately to Drive', async () => {
     const context = { ...initialContext };
+    const lister = jest.fn();
     const providedTask: Partial<ListrTaskWrapper<any, any>> = {
-      newListr: jest.fn(),
+      newListr: lister,
     };
 
     const path = './dist/files';
@@ -47,8 +49,11 @@ describe('Uploading tasks', () => {
         task: expect.anything(),
       },
     ];
-    const tasks = uploadFolderToDrive(path);
-    expect(tasks).toEqual(expectedTasks);
+    const task = uploadFolderToDrive(path);
+    await task(null, providedTask as ListrTaskWrapper<any, any>);
+    expect(lister).toHaveBeenCalledWith(expectedTasks, expect.anything());
+
+    const tasks = lister.mock.calls[0][0] as ListrTask<any>[];
 
     await Promise.all(
       tasks.map(({ task }) =>

@@ -19,7 +19,7 @@ export const evaluateContextAndDetermineNextAction = (
             task: async () => {},
           },
         ]
-      : getRedactFileSyncTasks(); // TODO refactor this to take taskr params
+      : getRedactFileSyncTasks(task);
 
   return task.newListr(tasks);
 };
