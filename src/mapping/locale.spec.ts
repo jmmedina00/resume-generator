@@ -2,7 +2,13 @@ import { getFlattenedObjectAndLocales } from './locale';
 
 describe('Object locale', () => {
   it('should return object as-is when no locales are present', () => {
-    const subject = { a: 1, b: 'Thirty', c: 'Test' };
+    const subject = {
+      a: 1,
+      b: 'Thirty',
+      c: 'Test',
+      condition: true,
+      secret: false,
+    };
     const { flattened, locales } = getFlattenedObjectAndLocales(subject);
 
     expect(flattened).toEqual(subject);
@@ -18,6 +24,11 @@ describe('Object locale', () => {
         fr: 'Bonjour',
       },
       train: 'Trenecito',
+      generic: false,
+      check: {
+        en: true,
+        es: false,
+      },
       another: {
         ja: 'ひらがな',
         fr: 'lettres',
@@ -26,6 +37,8 @@ describe('Object locale', () => {
 
     const expectedFlattened = {
       notTranslated: 'Hello',
+      generic: false,
+      check: 'check',
       translated: 'translated',
       train: 'Trenecito',
       another: 'another',
@@ -34,9 +47,11 @@ describe('Object locale', () => {
     const expectedLocales = {
       es: {
         translated: 'Hola',
+        check: false,
       },
       en: {
         translated: 'Hi',
+        check: true,
       },
       fr: { translated: 'Bonjour', another: 'lettres' },
       ja: { another: 'ひらがな' },
@@ -64,6 +79,7 @@ describe('Object locale', () => {
           test: 'Zero',
           localised: {
             en: 'Silly',
+            es: true,
           },
         },
       },
@@ -87,7 +103,7 @@ describe('Object locale', () => {
     const expectedLocales = {
       ja: { nest: { subject: 'ひらがな' } },
       fr: { nest: { subject: 'lettres' } },
-      es: { nest: { oneMore: 'Máaaaas' } },
+      es: { nest: { oneMore: 'Máaaaas', nested: { localised: true } } },
       en: { nest: { nested: { localised: 'Silly' } } },
     };
 
@@ -112,17 +128,19 @@ describe('Object locale', () => {
           en: 'five',
           es: 'cinco',
         },
+        false,
+        { en: true, es: false },
       ],
     };
 
     const expectedFlattened = {
       test: 'Testing',
-      keywords: ['one', 'two', '2', 'cuatro', '4'],
+      keywords: ['one', 'two', '2', 'cuatro', '4', false, '6'],
     };
 
     const expectedLocales = {
-      es: { keywords: { 2: 'tres', 4: 'cinco' } },
-      en: { keywords: { 2: 'three', 4: 'five' } },
+      es: { keywords: { 2: 'tres', 4: 'cinco', 6: false } },
+      en: { keywords: { 2: 'three', 4: 'five', 6: true } },
     };
 
     const { flattened, locales } = getFlattenedObjectAndLocales(subject);
@@ -144,12 +162,14 @@ describe('Object locale', () => {
         en: 'five',
         es: 'cinco',
       },
+      false,
+      { en: true, es: false },
     ];
 
-    const expectedFlattened = ['one', 'two', '2', 'cuatro', '4'];
+    const expectedFlattened = ['one', 'two', '2', 'cuatro', '4', false, '6'];
     const expectedLocales = {
-      es: { 2: 'tres', 4: 'cinco' },
-      en: { 2: 'three', 4: 'five' },
+      es: { 2: 'tres', 4: 'cinco', 6: false },
+      en: { 2: 'three', 4: 'five', 6: true },
     };
 
     const { flattened, locales } = getFlattenedObjectAndLocales(subject);

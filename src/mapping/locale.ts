@@ -18,7 +18,7 @@ const crushLocaleMapsTogether = (finalMap: LocaleMap, map: LocaleMap) => {
 };
 
 const getProperLocaliser = (value: any) => {
-  if (['string', 'number'].includes(typeof value)) {
+  if (['string', 'number', 'boolean'].includes(typeof value)) {
     return getEntryAsIs;
   }
 
