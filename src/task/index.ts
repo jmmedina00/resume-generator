@@ -7,6 +7,7 @@ import { getExportTasksForAllResumeVersions } from './resume/export';
 import { uploadFolderToDrive } from './io/upload';
 import { getResumeLoadingTasks } from './resume/import';
 import { getMarkdownRenderingTasks } from './markdown';
+import { generateFocusedVersionsAndCleanPublicOnes } from './resume/focused';
 
 export const isThisCI = () => !!process.env['CI'];
 
@@ -19,6 +20,10 @@ export const tasks = new Listr<ResumeContext>(
     {
       title: 'Produce public resume versions',
       task: getPublicResumeCreationTasks,
+    },
+    {
+      title: 'Produce focused versions (and clean public ones)',
+      task: generateFocusedVersionsAndCleanPublicOnes,
     },
     {
       title: 'Produce private versions',

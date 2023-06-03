@@ -1,8 +1,10 @@
+import { join } from 'path';
 import { ResumeContext, initialContext } from '../../context';
 import { FileDescriptor } from '../../describe';
 import {
   PRIVATE_DIST,
   PUBLIC_DIST,
+  getFocusedVersionDescriptors,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './descriptor';
@@ -33,6 +35,34 @@ describe('Resume descriptors', () => {
     ];
 
     const actual = getPublicVersionDescriptors(context);
+    expect(actual).toEqual(expected);
+  });
+
+  it('should produce focused descriptors', () => {
+    const context: ResumeContext = {
+      ...initialContext,
+      focusedVersions: {
+        en: { foo: 'bar' },
+        es: { bar: 'baz' },
+      },
+    };
+
+    const expected: FileDescriptor[] = [
+      {
+        dir: join(PUBLIC_DIST, 'en'),
+        name: 'focused',
+        subfolder: true,
+        contents: JSON.stringify({ foo: 'bar' }),
+      },
+      {
+        dir: join(PUBLIC_DIST, 'es'),
+        name: 'focused',
+        subfolder: true,
+        contents: JSON.stringify({ bar: 'baz' }),
+      },
+    ];
+
+    const actual = getFocusedVersionDescriptors(context);
     expect(actual).toEqual(expected);
   });
 

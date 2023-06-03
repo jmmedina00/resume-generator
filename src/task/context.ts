@@ -20,6 +20,7 @@ export interface ResumeContext {
   privateIterations: any[];
   privateVersions: LocalisedIterations;
   publicVersions: LocalisedVersions;
+  focusedVersions: LocalisedVersions;
 }
 
 export interface RenderContext {
@@ -54,4 +55,5 @@ export const initialContext: ResumeContext = {
   privateIterations: [],
   privateVersions: {},
   publicVersions: {},
+  focusedVersions: {},
 };

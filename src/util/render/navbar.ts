@@ -33,6 +33,11 @@ const formats: FormatLink[] = [
     label: 'JSON',
     icon: 'braces',
   },
+  {
+    href: 'focused/resume.md.html',
+    label: 'Focused',
+    icon: 'book-half',
+  },
 ];
 
 export const generateFromTemplate = (template: string, items: LanguageLink[]) =>

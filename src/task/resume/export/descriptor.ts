@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { ResumeContext } from '../../context';
 import { FileDescriptor } from '../../describe';
 
@@ -12,6 +13,16 @@ export const getPublicVersionDescriptors = ({
     name: version,
     subfolder: true,
     contents: JSON.stringify(publicVersions[version]),
+  }));
+
+export const getFocusedVersionDescriptors = ({
+  focusedVersions,
+}: ResumeContext): FileDescriptor[] =>
+  Object.keys(focusedVersions).map((version) => ({
+    dir: join(PUBLIC_DIST, version),
+    name: 'focused',
+    subfolder: true,
+    contents: JSON.stringify(focusedVersions[version]),
   }));
 
 export const getPrivateVersionDescriptors = ({

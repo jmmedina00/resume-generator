@@ -1,6 +1,7 @@
 import { ListrTask, ListrTaskWrapper } from 'listr2';
 import { Options } from 'prettier';
 import {
+  getFocusedVersionDescriptors,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './descriptor';
@@ -63,6 +64,18 @@ describe('Resume export index', () => {
         contents: 'baz',
       },
     ]);
+    (getFocusedVersionDescriptors as jest.Mock).mockReturnValue([
+      {
+        dir: 'public/foo',
+        name: 'focus',
+        contents: 'bar',
+      },
+      {
+        dir: 'publica/bar',
+        name: 'focused',
+        contents: 'baz',
+      },
+    ]);
     (getPrivateVersionDescriptors as jest.Mock).mockReturnValue([
       {
         dir: 'private',
@@ -102,6 +115,17 @@ describe('Resume export index', () => {
       },
     };
 
+    const expectedFocusedTemplates = {
+      json: {
+        options: prettierOptions,
+        render: 'json',
+      },
+      md: {
+        options: prettierOptions,
+        render: 'markdown',
+      },
+    };
+
     const expectedTasks = [
       {
         title: 'PUBLIC - version: foo, sub: le',
@@ -125,6 +149,30 @@ describe('Resume export index', () => {
           },
           dir: 'publica',
           name: 'bar',
+          contents: 'baz',
+        },
+      },
+      {
+        title: 'FOCUSED - version: foo',
+        task: {
+          validateFn: validateResumeWithSchema,
+          templates: {
+            ...expectedFocusedTemplates,
+          },
+          dir: 'public/foo',
+          name: 'focus',
+          contents: 'bar',
+        },
+      },
+      {
+        title: 'FOCUSED - version: bar',
+        task: {
+          validateFn: validateResumeWithSchema,
+          templates: {
+            ...expectedFocusedTemplates,
+          },
+          dir: 'publica/bar',
+          name: 'focused',
           contents: 'baz',
         },
       },

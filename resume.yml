@@ -27,6 +27,7 @@ languages:
       es: Francés
       en: French
     fluency: B1
+    important: false
 
 certificates: Get from Credly
 
@@ -42,6 +43,7 @@ projects:
     endDate: 2022-10-30
 
   fancy-countdown:
+    important: false
     type: application
     repo-description: en
     page-active: yes
@@ -80,6 +82,7 @@ skills:
       en: Systems
       es: Sistemas
     level: Junior
+    important: false
     keywords:
       - Linux
       - Docker
@@ -89,6 +92,7 @@ skills:
 work:
   ey-dev:
     name: EY
+    important: true
     url: https://www.ey.com/
     position:
       en: Full-Stack Developer
@@ -115,6 +119,7 @@ work:
 
   tekwurx-consulting:
     name: Tekwurx
+    important: false
     url: https://tekwurx.com/
     position:
       en: Technical Consultant

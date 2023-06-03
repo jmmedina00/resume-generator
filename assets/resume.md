@@ -95,3 +95,5 @@
 {{/keywords}}
 
 {{/skills}}
+
+[JSON](resume.json)
