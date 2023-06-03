@@ -1,6 +1,6 @@
 import locale, { LanguageCode } from 'iso-639-1';
 import { EntryLocaliser, LocaleMap, LocalisedObject } from './locale.types';
-import { Entry, regenerateFromEntries } from './common';
+import { Entry, isPlainType, regenerateFromEntries } from './common';
 
 const codes = locale.getAllCodes() as string[];
 
@@ -18,7 +18,7 @@ const crushLocaleMapsTogether = (finalMap: LocaleMap, map: LocaleMap) => {
 };
 
 const getProperLocaliser = (value: any) => {
-  if (['string', 'number', 'boolean'].includes(typeof value)) {
+  if (isPlainType(value)) {
     return getEntryAsIs;
   }
 
