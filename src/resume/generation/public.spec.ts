@@ -1,25 +1,23 @@
-import { dekeyObject } from '../mapping/dekey';
-import { extractKey } from '../mapping/extract';
-import { LocalisedObject } from '../mapping/locale.types';
-import { patchObject } from '../mapping/patch';
-import { GithubUserInfo } from '../service/github';
-import { LanguageLink, generateFromTemplate } from '../util/render/navbar';
+import { LocalisedObject } from '../../mapping/locale.types';
+import { patchObject } from '../../mapping/patch';
+import { GithubUserInfo } from '../../service/github';
+import { LanguageLink, generateFromTemplate } from '../../util/render/navbar';
 import {
   addGitHubInfoToBasics,
   getDekeyedSectionFromObject,
   getNavigationBar,
   getProperProjects,
   getTranslated,
-} from './gen-public';
-import { PartialProfiles, Profile, getFullProfiles } from './profile';
-import { ResumeProject, getResumeProject } from './project';
+} from './public';
+import { PartialProfiles, Profile, getFullProfiles } from '../profile';
+import { ResumeProject, getResumeProject } from '../project';
+import { dekeyObject, extractKey } from '../../mapping/generic';
 
-jest.mock('../util/render/navbar');
-jest.mock('../mapping/dekey');
-jest.mock('../mapping/extract');
-jest.mock('../mapping/patch');
-jest.mock('./profile');
-jest.mock('./project');
+jest.mock('../../util/render/navbar');
+jest.mock('../../mapping/generic');
+jest.mock('../../mapping/patch');
+jest.mock('../profile');
+jest.mock('../project');
 
 describe('Public version generation', () => {
   const gitHubUser: GithubUserInfo = {

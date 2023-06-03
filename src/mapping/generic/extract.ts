@@ -1,4 +1,4 @@
-import { LocalisedObject } from './locale.types';
+import { LocalisedObject } from '../locale.types';
 
 export const extractKey = (
   { flattened, locales: verboseyLocales }: LocalisedObject,

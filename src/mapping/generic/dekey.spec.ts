@@ -1,5 +1,5 @@
 import { dekeyObject } from './dekey';
-import { LocalisedObject } from './locale.types';
+import { LocalisedObject } from '../locale.types';
 
 describe('Object dekeying', () => {
   it('should return flattened as array and turn defaulted fields into previous key', () => {

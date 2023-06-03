@@ -1,4 +1,4 @@
-import { isPlainType, regenerateFromEntries } from './common';
+import { isPlainType, regenerateFromEntries } from '../common';
 
 export const INCLUDE_EVERYTHING = 1;
 export const INCLUDE_IMPORTANT_ONLY = 2;

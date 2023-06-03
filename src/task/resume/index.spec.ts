@@ -16,7 +16,7 @@ import { ResumeContext, initialContext } from '../context';
 import {
   addGitHubInfoToBasics,
   getProperProjects,
-} from '../../resume/gen-public';
+} from '../../resume/generation/public';
 
 jest.mock('./public');
 jest.mock('../io/task');

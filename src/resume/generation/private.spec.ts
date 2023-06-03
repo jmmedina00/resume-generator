@@ -1,4 +1,4 @@
-import { getPrivateVersionGenerator } from './gen-private';
+import { getPrivateVersionGenerator } from './private';
 
 describe('Private version generation', () => {
   it('should produce as many versions as private iterations, only appending to basics incrementally', () => {

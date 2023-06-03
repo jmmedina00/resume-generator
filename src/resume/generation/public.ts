@@ -1,11 +1,10 @@
-import { GithubUserInfo } from '../service/github';
-import { PartialProfiles, getFullProfiles } from './profile';
-import { ResumeProject, getResumeProject } from './project';
-import { dekeyObject } from '../mapping/dekey';
-import { extractKey } from '../mapping/extract';
-import { LocalisedObject } from '../mapping/locale.types';
-import { patchObject } from '../mapping/patch';
-import { LanguageLink, generateFromTemplate } from '../util/render/navbar';
+import { GithubUserInfo } from '../../service/github';
+import { PartialProfiles, getFullProfiles } from '../profile';
+import { ResumeProject, getResumeProject } from '../project';
+import { dekeyObject, extractKey } from '../../mapping/generic';
+import { LocalisedObject } from '../../mapping/locale.types';
+import { patchObject } from '../../mapping/patch';
+import { LanguageLink, generateFromTemplate } from '../../util/render/navbar';
 import langmap from 'langmap';
 
 export const addGitHubInfoToBasics = async (

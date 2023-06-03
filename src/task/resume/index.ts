@@ -9,7 +9,7 @@ import {
 import {
   addGitHubInfoToBasics,
   getProperProjects,
-} from '../../resume/gen-public';
+} from '../../resume/generation/public';
 import { getFullTaskName } from '../io/task';
 
 export const TASK_COMPLETE_BASICS = 'Complete basics';

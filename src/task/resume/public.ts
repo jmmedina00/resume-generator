@@ -2,7 +2,7 @@ import { getFlattenedObjectAndLocales } from '../../mapping/locale';
 import {
   getDekeyedSectionFromObject,
   getTranslated,
-} from '../../resume/gen-public';
+} from '../../resume/generation/public';
 import { GithubUserInfo } from '../../service/github';
 import { ResumeContext } from '../context';
 

@@ -1,5 +1,5 @@
 import { render } from 'mustache';
-import { getNavigationBar } from '../../../resume/gen-public';
+import { getNavigationBar } from '../../../resume/generation/public';
 import { addAtBodyBottom, addAtBodyTop, addStyles } from '../../../util/render';
 import {
   RenderContext,

@@ -4,7 +4,7 @@ import {
   addGitHubInfoToBasics,
   getDekeyedSectionFromObject,
   getTranslated,
-} from '../../resume/gen-public';
+} from '../../resume/generation/public';
 import { ResumeContext, initialContext } from '../context';
 import {
   transformAndReplaceLocalisedField,
@@ -13,7 +13,7 @@ import {
   transformLocalisedToTranslated,
 } from './public';
 
-jest.mock('../../resume/gen-public'); // Just check types fit target functions
+jest.mock('../../resume/generation/public'); // Just check types fit target functions
 jest.mock('../../mapping/locale');
 
 describe('Transforming tasks', () => {

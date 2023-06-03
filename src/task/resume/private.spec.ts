@@ -1,8 +1,8 @@
-import { getPrivateVersionGenerator } from '../../resume/gen-private';
+import { getPrivateVersionGenerator } from '../../resume/generation/private';
 import { ResumeContext, initialContext } from '../context';
 import { generatePrivateVersions } from './private';
 
-jest.mock('../../resume/gen-private');
+jest.mock('../../resume/generation/private');
 
 describe('Private version tasks', () => {
   it('should generate and store private versions from context iterators', async () => {

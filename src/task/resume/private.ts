@@ -1,4 +1,4 @@
-import { getPrivateVersionGenerator } from '../../resume/gen-private';
+import { getPrivateVersionGenerator } from '../../resume/generation/private';
 import { ResumeContext } from '../context';
 
 export const generatePrivateVersions = async (

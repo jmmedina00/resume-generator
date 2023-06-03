@@ -1,5 +1,5 @@
 import { extractKey } from './extract';
-import { LocalisedObject } from './locale.types';
+import { LocalisedObject } from '../locale.types';
 
 describe('Localised object key extraction', () => {
   it('should provide object as-is along with locales from existing localised object', () => {

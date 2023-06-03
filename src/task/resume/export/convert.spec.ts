@@ -10,7 +10,7 @@ import {
   getResumeToPdfConverter,
 } from './convert';
 import puppeteer from 'puppeteer';
-import { getNavigationBar } from '../../../resume/gen-public';
+import { getNavigationBar } from '../../../resume/generation/public';
 import { addAtBodyBottom, addAtBodyTop, addStyles } from '../../../util/render';
 import { LocalisedObject } from '../../../mapping/locale.types';
 import { render } from 'mustache';
@@ -44,7 +44,7 @@ jest.mock('puppeteer', () => {
 });
 
 jest.mock('../../../service/github/util');
-jest.mock('../../../resume/gen-public');
+jest.mock('../../../resume/generation/public');
 jest.mock('../../../util/render');
 jest.mock('fs/promises');
 jest.mock('mustache');
