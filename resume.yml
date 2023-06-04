@@ -29,7 +29,29 @@ languages:
     fluency: B1
     important: false
 
-certificates: Get from Credly
+certificates:
+  - name: 'Microsoft Certified: Dynamics 365 Fundamentals (CRM)'
+    issuer: Microsoft
+    date: 2022-07-25
+    url: https://www.credly.com/badges/103145cd-fa6a-47c1-bf8e-39d5f33cbe0e/public_url
+    important: false
+
+  - name: 'Microsoft Certified: Azure AI Fundamentals'
+    issuer: Microsoft
+    date: 2022-01-25
+    url: https://www.credly.com/badges/1de4da5e-998a-4b26-b42e-6ba4e6c3f0a1/public_url
+    important: true
+
+  - name: 'Microsoft Certified: Azure Fundamentals'
+    issuer: Microsoft
+    date: 2022-01-24
+    url: https://www.credly.com/badges/73166e2b-0285-4eb6-884e-36c60e7fcd84/public_url
+
+  - name: 'Microsoft Certified: Azure Data Fundamentals'
+    issuer: Microsoft
+    date: 2021-12-23
+    url: https://www.credly.com/badges/8533f1c4-e64a-4fea-8c58-33c806bd78cb/public_url
+    important: false
 
 projects:
   rolldapass:

@@ -84,6 +84,20 @@
 
 {{/projects}}
 
+# Certs
+
+{{#certificates}}
+
+## {{name}}
+
+### {{issuer}}
+
+#### {{date}}
+
+{{url}}
+
+{{/certificates}}
+
 # Skills
 
 {{#skills}}

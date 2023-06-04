@@ -19,10 +19,12 @@ export const transformIncompleteField =
 export const transformCompleteToLocalised = async (
   ctx: ResumeContext
 ): Promise<void> => {
-  const { basics, languages, projects, skills, work, education } = ctx.complete;
+  const { basics, languages, certificates, projects, skills, work, education } =
+    ctx.complete;
   ctx.localised = getFlattenedObjectAndLocales({
     basics,
     languages,
+    certificates,
     projects,
     skills,
     work,

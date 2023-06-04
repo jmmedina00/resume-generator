@@ -71,6 +71,7 @@ describe('Transforming tasks', () => {
       complete: {
         basics: { foo: 'bar' },
         languages: [{ name: 'English', learnedAt: 'foo' }],
+        certificates: ['ai', 'blockchain'],
         projects: { calculator: { foo: 'qwe' }, display: { foo: 'asd' } },
         skills: ['coding', 'fishing'],
         work: { dev: { test: 'foo' }, consult: { test: 'bar' } },
@@ -96,6 +97,7 @@ describe('Transforming tasks', () => {
     expect(getFlattenedObjectAndLocales).toHaveBeenCalledWith({
       basics: { foo: 'bar' },
       languages: [{ name: 'English', learnedAt: 'foo' }],
+      certificates: ['ai', 'blockchain'],
       projects: { calculator: { foo: 'qwe' }, display: { foo: 'asd' } },
       skills: ['coding', 'fishing'],
       work: { dev: { test: 'foo' }, consult: { test: 'bar' } },

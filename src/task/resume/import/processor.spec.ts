@@ -35,6 +35,8 @@ describe('Data to resume context processors', () => {
 
     const languages = ['es', 'en'];
 
+    const certificates = ['ai', 'blockchain'];
+
     const projects = {
       todo: {
         description: 'Test',
@@ -64,6 +66,7 @@ describe('Data to resume context processors', () => {
     (parse as jest.Mock).mockReturnValue({
       basics,
       languages,
+      certificates,
       projects,
       skills,
       work,
@@ -78,6 +81,7 @@ describe('Data to resume context processors', () => {
       },
       complete: {
         languages,
+        certificates,
         skills,
         work,
         education,

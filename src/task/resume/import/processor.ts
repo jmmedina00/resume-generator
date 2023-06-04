@@ -14,11 +14,11 @@ export const addResumePartsToTheirCorrectPlaces: Processor<
   ResumeContext,
   string
 > = (resume, context) => {
-  const { basics, languages, projects, skills, work, education } =
+  const { basics, languages, certificates, projects, skills, work, education } =
     parse(resume);
 
   context.incomplete = { basics, projects };
-  context.complete = { languages, skills, work, education };
+  context.complete = { languages, certificates, skills, work, education };
 };
 
 export const parsePrivateIterations: Processor<ResumeContext, string> = (
