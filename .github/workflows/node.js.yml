@@ -46,11 +46,18 @@ jobs:
 
       - run: npm start
         env:
-          AUTH_GITHUB: ${{ secrets.githubToken }}
+          AUTH_GITHUB: ${{ secrets.GITHUB_TOKEN }} # Provided by GitHub Actions
           GOOGLE_SERVICE_ACCOUNT: ${{ secrets.googleServiceAccount }}
           GOOGLE_DRIVE_FOLDER: ${{ secrets.drivePrivateFolder }}
           PRIVATE_FILE_ID: ${{ secrets.privateFileInDrive }}
           PRIVATE_PASSWORD: ${{ secrets.privateFilePassword }}
+
+      - name: Deploy public version to gist
+        uses: exuanbo/actions-deploy-gist@v1
+        with:
+          token: ${{ secrets.gitHubGistToken }}
+          gist_id: ${{ secrets.gistId }}
+          file_path: public/en/resume.json
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
