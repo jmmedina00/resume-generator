@@ -48,9 +48,12 @@ describe('Markdown rendering', () => {
     };
 
     await parseMarkdownIntoDocument(context);
-    expect(marked.use).toHaveBeenCalledWith({
-      renderer: { listitem: expect.anything() },
-    });
+    expect(marked.use).toHaveBeenCalledWith(
+      {
+        renderer: { listitem: expect.anything() },
+      },
+      { mangle: false, headerIds: false } // Used to solve deprecated warnings (and remove some garbage)
+    );
 
     const itemCleaner = (marked.use as jest.Mock).mock.calls[0][0]['renderer'][
       'listitem'

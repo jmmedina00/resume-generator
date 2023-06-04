@@ -53,7 +53,7 @@ exports.render = (resume) => {
   });
 
   marked.setOptions({ extensions: [] });
-  marked.use({ renderer });
+  marked.use({ renderer }, { mangle: false, headerIds: false });
   const contents = marked.parse(generatedMarkdown);
   const dom = new JSDOM(contents);
   const nodes = [...dom.window.document.body.children];

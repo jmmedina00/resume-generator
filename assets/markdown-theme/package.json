@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "jsdom": "^22.1.0",
-    "marked": "^4.3.0",
+    "marked": "^5.0.4",
     "mustache": "^4.2.0"
   }
 }

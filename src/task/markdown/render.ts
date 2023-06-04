@@ -11,7 +11,7 @@ export const parseMarkdownIntoDocument = async (
 ): Promise<void> => {
   const md = ctx.contents.toString('utf-8');
 
-  marked.use({ renderer: { listitem } });
+  marked.use({ renderer: { listitem } }, { mangle: false, headerIds: false });
   const html = marked.parse(md);
 
   const template = await readFile('./assets/markdown.html', 'utf-8');
