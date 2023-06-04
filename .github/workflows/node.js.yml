@@ -46,7 +46,7 @@ jobs:
 
       - run: npm start
         env:
-          AUTH_GITHUB: ${{ secrets.GITHUB_TOKEN }} # Provided by GitHub Actions
+          AUTH_GITHUB: ${{ secrets.gitHubGistToken }}
           GOOGLE_SERVICE_ACCOUNT: ${{ secrets.googleServiceAccount }}
           GOOGLE_DRIVE_FOLDER: ${{ secrets.drivePrivateFolder }}
           PRIVATE_FILE_ID: ${{ secrets.privateFileInDrive }}
