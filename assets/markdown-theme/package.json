@@ -1,0 +1,16 @@
+{
+  "name": "jsonresume-theme-markdown",
+  "version": "1.0.0",
+  "description": "Temporary measure while I make a proper theme for PDF exporting",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test-render.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "jsdom": "^22.1.0",
+    "marked": "^4.3.0",
+    "mustache": "^4.2.0"
+  }
+}

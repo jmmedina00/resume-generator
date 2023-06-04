@@ -14,10 +14,26 @@
       * {
         font-family: 'Roboto', sans-serif;
         text-decoration: none;
+        color: inherit;
       }
 
       body {
         margin: 1em;
+      }
+
+      @media print {
+        @page {
+          margin: 2cm;
+        }
+
+        body {
+          margin: 0;
+        }
+      }
+
+      article,
+      .break-me-not {
+        break-inside: avoid;
       }
 
       h1 {

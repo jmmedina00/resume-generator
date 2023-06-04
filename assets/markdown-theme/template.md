@@ -16,7 +16,7 @@
 
 {{#profiles}}
 
-- [{{network}}]({{url}})
+- {{network}}: {{&url}}
 
 {{/profiles}}
 
@@ -26,9 +26,11 @@
 
 {{#work}}
 
-## {{position}} @ [{{name}}]({{url}})
+## {{position}} @ {{name}}
 
 #### {{#addArrow}}{{startDate}} {{endDate}}{{/addArrow}}
+
+###### {{&url}}
 
 {{summary}}
 
@@ -44,9 +46,11 @@
 
 {{#education}}
 
-## {{studyType}} @ [{{institution}}]({{url}})
+## {{studyType}} @ {{institution}}
 
 ### {{area}}
+
+###### {{&url}}
 
 #### {{#addArrow}}{{startDate}} {{endDate}}{{/addArrow}} ({{score}})
 
@@ -62,13 +66,15 @@
 
 {{#projects}}
 
-## [{{name}}]({{url}})
+## {{name}}
 
 ### {{description}}
 
 #### {{#addArrow}}{{startDate}} {{endDate}}{{/addArrow}}
 
 ##### {{#cleanup}}{{#keywords}}{{.}}, {{/keywords}}{{/cleanup}}
+
+{{&url}}
 
 {{#highlights}}
 
@@ -82,7 +88,7 @@
 
 {{#skills}}
 
-### {{name}} _{{level}}_
+## {{name}} _{{level}}_
 
 {{#keywords}}
 
@@ -91,5 +97,3 @@
 {{/keywords}}
 
 {{/skills}}
-
-[JSON](resume.json)

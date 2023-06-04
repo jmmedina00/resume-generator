@@ -22,7 +22,7 @@
     "form-data": "^4.0.0",
     "iso-639-1": "^2.1.15",
     "jsonresume-theme-even": "^0.18.1",
-    "jsonresume-theme-spartacus": "^1.0.0",
+    "jsonresume-theme-markdown": "file:assets/markdown-theme",
     "jsonwebtoken": "^9.0.0",
     "langmap": "^0.0.16",
     "listr2": "^6.2.0",

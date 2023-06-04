@@ -12,13 +12,25 @@ import { getPagesLinkFromRepo } from '../../../service/github/util';
 
 const getTheme = (themeModule: string) => 'jsonresume-theme-' + themeModule;
 
+const splitAndRejoin =
+  (splitter: string | RegExp, joiner: string) =>
+  (text: string, render: (text: string) => string) =>
+    render(text)
+      .trim()
+      .split(splitter)
+      .filter((a) => !!a)
+      .join(joiner);
+
+const addArrow = () => splitAndRejoin(' ', ' → ');
+const cleanup = () => splitAndRejoin(/, ?/, ', ');
+
 export const getResumeToFilledTemplateConverter =
   (templatePath: string) =>
   async (ctx: RenderContext): Promise<void> => {
     const jsonResume = JSON.parse(ctx.contents.toString());
 
     const template = await readFile(templatePath, 'utf-8');
-    const rendered = render(template, jsonResume);
+    const rendered = render(template, { ...jsonResume, addArrow, cleanup });
 
     ctx.contents = Buffer.from(rendered);
   };

@@ -12,7 +12,7 @@ import {
 const schema = require('resume-schema');
 
 export const THEME_HTML = 'even';
-export const THEME_PDF = 'spartacus';
+export const THEME_PDF = 'markdown';
 export const PATH_MARKDOWN_TEMPLATE = './assets/resume.md';
 export const PATH_NAVBAR_TEMPLATE = './assets/navbar.html';
 export const PATH_FOOTER_TEMPLATE = './assets/footer.html';

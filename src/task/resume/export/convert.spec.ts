@@ -50,7 +50,7 @@ jest.mock('fs/promises');
 jest.mock('mustache');
 
 describe('Resume to document conversion', () => {
-  it('should replace JSON contents with rendered template from mustache', async () => {
+  it('should replace JSON contents with rendered template from mustache - object should also include helper functions', async () => {
     (render as jest.Mock).mockReturnValue('Rendered');
     (readFile as jest.Mock).mockReturnValue('Template');
 
@@ -73,7 +73,59 @@ describe('Resume to document conversion', () => {
 
     expect(context).toEqual(expectedContext);
     expect(readFile).toHaveBeenCalledWith('./template.txt', 'utf-8');
-    expect(render).toHaveBeenCalledWith('Template', { foo: 'foo', bar: 'bar' });
+    expect(render).toHaveBeenCalledWith('Template', {
+      foo: 'foo',
+      bar: 'bar',
+      addArrow: expect.anything(),
+      cleanup: expect.anything(),
+    });
+  });
+
+  it('should provide mustache renderer with helper function for eliminating commas', async () => {
+    (render as jest.Mock).mockClear();
+    const context: RenderContext = {
+      contents: Buffer.from(JSON.stringify({ foo: 'foo', bar: 'bar' })),
+      path: '',
+      prettierOptions: {},
+      preprocessFn: jest.fn(), //This is where this feat would go
+    };
+
+    const task = getResumeToFilledTemplateConverter('./template.txt');
+    await task(context);
+
+    const cleanup = (render as jest.Mock).mock.calls[0][1]['cleanup']() as (
+      text: string,
+      render: (s: string) => string
+    ) => string;
+
+    const renderer = jest.fn().mockReturnValue('foo, bar, fizzbuzz, ');
+    const expected = 'foo, bar, fizzbuzz';
+    expect(cleanup('raw', renderer)).toEqual(expected);
+  });
+
+  it('should provide mustache renderer with helper function for joining value(s) with arrow', async () => {
+    (render as jest.Mock).mockClear();
+    const context: RenderContext = {
+      contents: Buffer.from(JSON.stringify({ foo: 'foo', bar: 'bar' })),
+      path: '',
+      prettierOptions: {},
+      preprocessFn: jest.fn(), //This is where this feat would go
+    };
+
+    const task = getResumeToFilledTemplateConverter('./template.txt');
+    await task(context);
+
+    const addArrow = (render as jest.Mock).mock.calls[0][1]['addArrow']() as (
+      text: string,
+      render: (s: string) => string
+    ) => string;
+
+    const renderer = jest.fn().mockReturnValue('foo bar');
+    const expectedForTwo = 'foo → bar';
+    expect(addArrow('raw', renderer)).toEqual(expectedForTwo);
+
+    renderer.mockReturnValue('alone');
+    expect(addArrow('raw', renderer)).toEqual('alone');
   });
 
   it('should replace JSON contents with contents provided by theme and navbar snip', async () => {
