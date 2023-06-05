@@ -61,6 +61,17 @@ projects:
 
     description:
       es: Generador de contraseñas hecho con React y Redux
+    highlights:
+      - Lazy-loading
+      - en: Configurable used symbols and length
+        es: Permite configurar símbolos usados y longitud
+
+      - en: Looks password's hash up in HaveIBeenPwned
+        es: Comprueba el hash de la contraseña contra HaveIBeenPwned
+
+      - en: Checks password against several selectable strength algorithms
+        es: Comprueba la contraseña contra varios algoritmos de fuerza; seleccionables
+
     startDate: 2022-09-09
     endDate: 2022-10-30
 
@@ -72,6 +83,12 @@ projects:
 
     description:
       es: Cuenta atrás glorificada
+    highlights:
+      - JS DOM
+      - CSS Transitions
+      - en: All flows made with observables
+        es: Observables usados en todos los flujos
+
     startDate: 2022-08-20
     endDate: 2022-09-08
 
