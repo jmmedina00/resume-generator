@@ -1,12 +1,16 @@
-import { ListrTaskWrapper } from 'listr2';
-import { RenderContext } from '../context';
-import { prettifyContentsofContext } from './pretty';
-import { writeContextToFile } from './io';
+import type { ListrTask, ListrTaskWrapper } from 'listr2';
+import type { RenderContext } from '../context';
 import { getFullTaskName } from '../io/task';
+import { prettifyContentsofContext } from './util/pretty';
+import { writeContextToFile } from './util';
 
 const TASK_PREPROCESS = 'Preprocess input';
 const TASK_PRETTY = 'Prettify input';
 const TASK_WRITE = 'Write to file';
+
+export type TaskYielder = (
+  task: ListrTaskWrapper<any, any>
+) => ListrTask<RenderContext, any>[];
 
 export const getRenderingTasks =
   (renderCtx: RenderContext) => (_: any, task: ListrTaskWrapper<any, any>) =>
@@ -27,4 +31,27 @@ export const getRenderingTasks =
         },
       ],
       { ctx: renderCtx, concurrent: false }
+    );
+
+export const render =
+  (path: string, src: string, yielders: TaskYielder[]) =>
+  <T>(_: any, task: ListrTaskWrapper<T, any>) =>
+    task.newListr<RenderContext>(
+      [
+        ...yielders.flatMap((yielder) => yielder(task)),
+        {
+          title: getFullTaskName(TASK_WRITE, task),
+          task: writeContextToFile,
+        },
+      ],
+      {
+        ctx: {
+          path,
+          resources: { src },
+          contents: Buffer.of(),
+          preprocessFn: () => '',
+          prettierOptions: {},
+        },
+        concurrent: false,
+      }
     );

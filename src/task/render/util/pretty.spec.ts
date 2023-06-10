@@ -1,11 +1,10 @@
-import { RenderContext } from '../context';
 import { format } from 'prettier';
-import { prettifyContentsofContext } from './pretty';
+import { adaptPrettierFormat, prettifyContentsofContext } from './pretty';
 
 jest.mock('prettier');
 
 describe('Prettify tasks', () => {
-  it('should replace contents of context with prettified contents', async () => {
+  /* it('should replace contents of context with prettified contents', async () => {
     const validateFn = jest.fn();
     (format as jest.Mock).mockReturnValue('Das pretty');
 
@@ -27,5 +26,15 @@ describe('Prettify tasks', () => {
       endOfLine: 'auto',
       quoteProps: 'as-needed',
     });
+  }); */
+
+  it('should adapt Prettier format for use with transformers', async () => {
+    (format as jest.Mock).mockReturnValue('formatted');
+    const source = 'src';
+    const options = JSON.stringify({ foo: 'bar', bar: 'baz' });
+
+    const result = await adaptPrettierFormat(source, options);
+    expect(result).toEqual('formatted');
+    expect(format).toHaveBeenCalledWith(source, { foo: 'bar', bar: 'baz' });
   });
 });

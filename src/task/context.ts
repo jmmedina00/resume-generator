@@ -1,6 +1,7 @@
 import { Options } from 'prettier';
 import { LocalisedObject } from '../mapping/locale.types';
 import { GithubUserInfo } from '../service/github';
+import { ListrTaskFn } from 'listr2';
 
 interface LocalisedVersions {
   [key: string]: any;
@@ -25,10 +26,13 @@ export interface ResumeContext {
 
 export interface RenderContext {
   path: string;
+  resources: {
+    [key: string]: string;
+  };
   contents: Buffer;
 
-  prettierOptions: Options;
-  preprocessFn: (foo: any) => Promise<any>;
+  prettierOptions: Options; // Goes out
+  preprocessFn: ListrTaskFn<RenderContext, any>; // Goes out
 }
 
 export interface RenderWithTemplateContext extends RenderContext {

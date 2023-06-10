@@ -1,8 +1,8 @@
-import { RenderContext } from '../context';
-import { writeToFile } from '../io/write';
+import type { RenderContext } from '../../context';
+import { writeToFile } from '../../io/write';
 import { writeContextToFile } from './io';
 
-jest.mock('../io/write');
+jest.mock('../../io/write');
 
 describe('Rendering wrapper tasks', () => {
   it('should manually get and call file writing', async () => {
@@ -12,6 +12,7 @@ describe('Rendering wrapper tasks', () => {
     const context: RenderContext = {
       path: 'foo/bar',
       contents: Buffer.from('why dis not work on its own'),
+      resources: {},
       prettierOptions: {},
       preprocessFn: jest.fn(),
     };
