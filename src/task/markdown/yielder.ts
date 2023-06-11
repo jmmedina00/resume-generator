@@ -8,40 +8,37 @@ import {
   bufferContextResource,
   bufferContextResourceAsIs,
 } from '../render/buffer';
+import {
+  KEY_PRETTIER_OPTIONS,
+  KEY_PRETTIFIED,
+  addParserWithPrettyOptions,
+  prettifyResource,
+} from '../render/shared';
 import { makeResourceFromExistingWithFn } from '../render/transform';
-import { adaptPrettierFormat, appendToObjectResource } from '../render/util';
 import { parseMarkdown } from './transform';
 
 const baseAssets: AssetsDeclaration = {
   template: './assets/markdown.html',
-  prettierOptions: '.prettierrc',
+  [KEY_PRETTIER_OPTIONS]: '.prettierrc',
 };
+
+export const KEY_RESULT_HOLDER = 'rendered';
 
 export const getYielders = (path: string) => [
   getLocalAssetGatheringYielder({ ...baseAssets, src: path }),
+  addParserWithPrettyOptions('html'),
   getParseYielder,
-  bufferContextResource(bufferContextResourceAsIs, 'pretty'),
+  prettifyResource(KEY_RESULT_HOLDER),
+  bufferContextResource(bufferContextResourceAsIs, KEY_PRETTIFIED),
 ];
 
 const getParseYielder: TaskYielder = (task) => [
   {
-    title: getFullTaskName('Add HTML parser', task),
-    task: appendToObjectResource('prettierOptions', { parser: 'html' }),
-  },
-  {
     title: getFullTaskName('Parse Markdown to HTML', task),
     task: makeResourceFromExistingWithFn(
       ['template', 'src'],
-      'rendered',
+      KEY_RESULT_HOLDER,
       parseMarkdown
-    ),
-  },
-  {
-    title: getFullTaskName('Prettify HTML', task),
-    task: makeResourceFromExistingWithFn(
-      ['rendered', 'prettierOptions'],
-      'pretty',
-      adaptPrettierFormat
     ),
   },
 ];

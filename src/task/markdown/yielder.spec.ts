@@ -1,4 +1,3 @@
-import { adaptPrettierFormat, appendToObjectResource } from '../render/util';
 import { getLocalAssetGatheringYielder } from '../render/assets';
 import {
   bufferContextResource,
@@ -6,13 +5,14 @@ import {
 } from '../render/buffer';
 import { makeResourceFromExistingWithFn } from '../render/transform';
 import { parseMarkdown } from './transform';
-import { getYielders } from './yielder';
+import { KEY_RESULT_HOLDER, getYielders } from './yielder';
 import type { ListrTask, ListrTaskFn, ListrTaskWrapper } from 'listr2';
+import { addParserWithPrettyOptions, prettifyResource } from '../render/shared';
 
-jest.mock('../render/util');
 jest.mock('../render/assets');
 jest.mock('../render/buffer');
 jest.mock('../render/transform');
+jest.mock('../render/shared');
 jest.mock('../io/task');
 
 describe('Markdown rendering yielder', () => {
@@ -20,16 +20,24 @@ describe('Markdown rendering yielder', () => {
     (getLocalAssetGatheringYielder as jest.Mock).mockImplementation(
       (assets) => (foo: any) => ({ title: 'Gather assets', task: assets })
     );
+    (addParserWithPrettyOptions as jest.Mock).mockImplementation(
+      (parser: string) => (foo: any) => ({
+        title: 'Parse',
+        task: { with: parser },
+      })
+    );
+    (prettifyResource as jest.Mock).mockImplementation(
+      (from: string) => (foo: any) => ({
+        title: 'Prettify',
+        task: { from },
+      })
+    );
     (bufferContextResource as jest.Mock).mockImplementation(
       (withFn, from) => (foo: any) => ({
         title: 'Buffer result',
         task: { with: withFn, from },
       })
     );
-    (appendToObjectResource as jest.Mock).mockImplementation((addTo, that) => ({
-      addTo,
-      that,
-    }));
     (makeResourceFromExistingWithFn as jest.Mock).mockImplementation(
       (sources, to, fn) => ({ sources, to, fn })
     );
@@ -44,26 +52,23 @@ describe('Markdown rendering yielder', () => {
         } as unknown as ListrTaskFn<any, any>,
       },
       {
-        title: 'Add HTML parser',
+        title: 'Parse',
         task: {
-          addTo: 'prettierOptions',
-          that: { parser: 'html' },
+          with: 'html',
         } as unknown as ListrTaskFn<any, any>,
       },
       {
         title: 'Parse Markdown to HTML',
         task: {
           sources: ['template', 'src'],
-          to: 'rendered',
+          to: KEY_RESULT_HOLDER,
           fn: parseMarkdown,
         } as unknown as ListrTaskFn<any, any>,
       },
       {
-        title: 'Prettify HTML',
+        title: 'Prettify',
         task: {
-          sources: ['rendered', 'prettierOptions'],
-          to: 'pretty',
-          fn: adaptPrettierFormat,
+          from: KEY_RESULT_HOLDER,
         } as unknown as ListrTaskFn<any, any>,
       },
       {
