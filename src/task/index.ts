@@ -8,6 +8,7 @@ import { uploadFolderToDrive } from './io/upload';
 import { getResumeLoadingTasks } from './resume/import';
 import { getMarkdownRenderingTasks } from './markdown';
 import { generateFocusedVersionsAndCleanPublicOnes } from './resume/focused';
+import { validateAllResumesInContext } from './resume/validate';
 
 export const isThisCI = () => !!process.env['CI'];
 
@@ -28,6 +29,10 @@ export const tasks = new Listr<ResumeContext>(
     {
       title: 'Produce private versions',
       task: generatePrivateVersions,
+    },
+    {
+      title: 'Validate all resume versions',
+      task: validateAllResumesInContext,
     },
     {
       title: 'Export resume versions',
