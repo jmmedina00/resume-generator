@@ -24,7 +24,21 @@ describe('Rendering asset tasks', () => {
     expect(task).toEqual({ key: 'myfile', path: './foo/bar.txt' });
   });
 
-  it('should get yielder for a whole asset declaration', () => {
+  it('should get yielder for a whole asset declaration that runs all getters in parallel', () => {
+    const lister = jest.fn().mockReturnValue({ listed: true });
+    const providedTask: Partial<ListrTaskWrapper<any, any>> = {
+      newListr: lister,
+    };
+
+    const dummy = jest.fn();
+    const context: RenderContext = {
+      path: '',
+      resources: {},
+      contents: Buffer.from('Brought over from parent'),
+      prettierOptions: {},
+      preprocessFn: dummy,
+    };
+
     const declaration = {
       foo: './foobar/foo.txt',
       bar: './foobar/bar.html',
@@ -46,10 +60,15 @@ describe('Rendering asset tasks', () => {
       },
     ];
 
-    const tasks: ListrTask<RenderContext>[] = getLocalAssetGatheringYielder(
+    const [task]: ListrTask<RenderContext>[] = getLocalAssetGatheringYielder(
       declaration
     )(null as unknown as ListrTaskWrapper<any, any>);
 
-    expect(tasks).toEqual(expectedTasks);
+    task.task(context, providedTask as ListrTaskWrapper<any, any>);
+
+    expect(lister).toHaveBeenCalledWith(expectedTasks, {
+      concurrent: true,
+      ctx: context,
+    });
   });
 });

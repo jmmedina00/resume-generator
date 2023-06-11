@@ -3,6 +3,7 @@ import { getFullTaskName } from '../io/task';
 import { readLocalFile } from '../io/read';
 import { setIntoContext } from './util';
 import type { TaskYielder } from '.';
+import { ListrTaskWrapper } from 'listr2';
 
 export interface AssetsDeclaration {
   [key: string]: string;
@@ -16,9 +17,23 @@ export const getLocalAssetIntoContextTask = (
 
 export const getLocalAssetGatheringYielder =
   (declaration: AssetsDeclaration): TaskYielder =>
-  (task) => {
-    return Object.entries(declaration).map(([key, path]) => ({
-      title: getFullTaskName(path, task),
-      task: getLocalAssetIntoContextTask(key, path),
-    }));
-  };
+  (task) =>
+    [
+      {
+        title: getFullTaskName('Gather assets', task),
+        task: (
+          ctx: RenderContext,
+          subtask: ListrTaskWrapper<RenderContext, any>
+        ) =>
+          subtask.newListr(
+            Object.entries(declaration).map(([key, path]) => ({
+              title: getFullTaskName(path, subtask),
+              task: getLocalAssetIntoContextTask(key, path),
+            })),
+            {
+              concurrent: true,
+              ctx,
+            }
+          ),
+      },
+    ];
