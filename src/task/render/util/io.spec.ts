@@ -13,8 +13,6 @@ describe('Rendering wrapper tasks', () => {
       path: 'foo/bar',
       contents: Buffer.from('why dis not work on its own'),
       resources: {},
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     await writeContextToFile(context);

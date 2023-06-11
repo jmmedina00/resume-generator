@@ -29,8 +29,6 @@ describe('Rendering index', () => {
       path: './foo/bar.html',
       resources: { src: 'start' },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: expect.anything(),
     };
 
     const task = getRenderingTasks('./foo/bar.html', 'start', [

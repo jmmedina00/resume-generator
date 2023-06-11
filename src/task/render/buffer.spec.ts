@@ -44,16 +44,12 @@ describe('Rendering result buffering', () => {
       path: '',
       resources: { toWrite: 'Please write me' },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     const expectedFinalContext: RenderContext = {
       path: '',
       resources: { toWrite: 'Please write me' },
       contents: Buffer.from('Please write me'),
-      prettierOptions: {},
-      preprocessFn: expect.anything(),
     };
 
     const task = bufferContextResourceAsIs('toWrite');
@@ -66,16 +62,12 @@ describe('Rendering result buffering', () => {
       path: '',
       resources: { toWrite: 'Please write me' },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     const expectedFinalContext: RenderContext = {
       path: '',
       resources: { toWrite: 'Please write me' },
       contents: Buffer.from('Moñeco'),
-      prettierOptions: {},
-      preprocessFn: expect.anything(),
     };
 
     const task = bufferContextResourceAsPdf('toWrite');

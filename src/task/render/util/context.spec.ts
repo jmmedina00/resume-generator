@@ -7,16 +7,12 @@ describe('Rendering context treating functions', () => {
       path: '',
       resources: {},
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     const expectedFinalContext: RenderContext = {
       path: '',
       resources: { stuff: 'Some random stuff' },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: expect.anything(),
     };
 
     setIntoContext('stuff')('Some random stuff', context);
@@ -28,8 +24,6 @@ describe('Rendering context treating functions', () => {
       path: '',
       resources: { test: JSON.stringify({ foo: 'bar', bar: 'baz' }) },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     const expectedFinalContext: RenderContext = {
@@ -38,8 +32,6 @@ describe('Rendering context treating functions', () => {
         test: JSON.stringify({ foo: 'bar', bar: 'baz', baz: 're' }),
       },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: expect.anything(),
     };
 
     appendToObjectResource('test', { baz: 're' })(context);

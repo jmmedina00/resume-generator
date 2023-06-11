@@ -18,8 +18,6 @@ describe('Footer applying', () => {
       path: '',
       resources: {},
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     const task = getRepoLink('repohere');

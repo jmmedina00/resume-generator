@@ -25,8 +25,6 @@ export const getRenderingTasks =
           path,
           resources: { src },
           contents: Buffer.of(),
-          preprocessFn: () => '',
-          prettierOptions: {},
         },
         concurrent: false,
       }

@@ -30,9 +30,6 @@ export interface RenderContext {
     [key: string]: string;
   };
   contents: Buffer;
-
-  prettierOptions: Options; // Goes out
-  preprocessFn: ListrTaskFn<RenderContext, any>; // Goes out
 }
 
 export interface RenderWithTemplateContext extends RenderContext {

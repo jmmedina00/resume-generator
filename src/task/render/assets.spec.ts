@@ -30,13 +30,10 @@ describe('Rendering asset tasks', () => {
       newListr: lister,
     };
 
-    const dummy = jest.fn();
     const context: RenderContext = {
       path: '',
       resources: {},
       contents: Buffer.from('Brought over from parent'),
-      prettierOptions: {},
-      preprocessFn: dummy,
     };
 
     const declaration = {

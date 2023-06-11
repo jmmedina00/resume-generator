@@ -16,8 +16,6 @@ describe('Rendering transform tasks', () => {
       path: '',
       resources: { test: 'This is a test', prueba: 'Esto es una prueba' },
       contents: Buffer.of(),
-      prettierOptions: {},
-      preprocessFn: jest.fn(),
     };
 
     const task = makeResourceFromExistingWithFn(
