@@ -1,6 +1,6 @@
 import { ListrTaskWrapper } from 'listr2';
 import { getRecursiveFileList } from '../../util/io';
-import { TaskYielder, render } from '../render';
+import { TaskYielder, getRenderingTasks } from '../render';
 import { getMarkdownRenderingTasks } from '.';
 import { getYielders } from './yielder';
 
@@ -30,7 +30,7 @@ describe('Markdown rendering tasks', () => {
       (foo: any) => ({ title: 'Do everything with ' + path, task: 'fizzbuzz' }),
     ]);
     (getRecursiveFileList as jest.Mock).mockResolvedValue(paths);
-    (render as jest.Mock).mockImplementation(
+    (getRenderingTasks as jest.Mock).mockImplementation(
       (path: string, contents: string, yielders: TaskYielder[]) => ({
         path,
         contents,

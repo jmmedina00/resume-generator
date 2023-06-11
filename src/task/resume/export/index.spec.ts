@@ -1,57 +1,46 @@
-import { ListrTask, ListrTaskWrapper } from 'listr2';
-import { Options } from 'prettier';
+import type { ListrTask, ListrTaskWrapper } from 'listr2';
 import {
   getFocusedVersionDescriptors,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './descriptor';
-import {
-  getHtmlRender,
-  getJsonRender,
-  getMarkdownRender,
-  getPdfRender,
-  getPrettierOptions,
-  validateResumeWithSchema,
-} from './config';
-import {
-  RenderContextTemplates,
-  getExportTasksFromDescriptor,
-} from '../../export';
-import { FileDescriptor } from '../../describe';
+import { htmlYielders, jsonYielders, mdYielders, pdfYielders } from './config';
+import { getDescribedPath } from '../../describe';
 import { getExportTasksForAllResumeVersions } from '.';
 import { ResumeContext, initialContext } from '../../context';
+import { getRenderingTasks } from '../../render';
+import { basename } from 'path';
 
 jest.mock('./descriptor');
 jest.mock('./config');
-jest.mock('../../export');
+jest.mock('../../describe');
+jest.mock('../../render');
 jest.mock('../../io/task');
 
 describe('Resume export index', () => {
   it('should consolidate descriptors and config into list of export tasks', async () => {
-    const prettierOptions: Options = { singleQuote: false, printWidth: 7 };
-
     const lister = jest.fn();
     const providedTask: Partial<ListrTaskWrapper<any, any>> = {
       newListr: lister,
     };
 
-    (getJsonRender as jest.Mock).mockImplementation(async (options) => ({
-      options,
-      render: 'json',
-    }));
-    (getHtmlRender as jest.Mock).mockImplementation(async (options, ctx) => ({
-      options,
-      ctx,
-      render: 'html',
-    }));
-    (getMarkdownRender as jest.Mock).mockImplementation(async (options) => ({
-      options,
-      render: 'markdown',
-    }));
-    (getPdfRender as jest.Mock).mockResolvedValue({ render: 'pdf' });
-    (getPrettierOptions as jest.Mock).mockResolvedValue(prettierOptions);
+    (jsonYielders as jest.Mock).mockReturnValue({ yield: 'json' });
+    (mdYielders as jest.Mock).mockReturnValue({ yield: 'md' });
+    (pdfYielders as jest.Mock).mockReturnValue({ yield: 'pdf' });
+    (htmlYielders as jest.Mock).mockReturnValue({ yield: 'html' });
 
-    (getPublicVersionDescriptors as jest.Mock).mockReturnValue([
+    (getRenderingTasks as jest.Mock).mockImplementation(
+      (path, src, yielders) => ({
+        path,
+        src,
+        yielders,
+      })
+    );
+    (getDescribedPath as jest.Mock).mockImplementation(
+      (descriptor, format) => ({ descriptor, format })
+    );
+
+    const publicDescriptors = [
       {
         dir: 'public',
         name: 'foo',
@@ -63,8 +52,9 @@ describe('Resume export index', () => {
         name: 'bar',
         contents: 'baz',
       },
-    ]);
-    (getFocusedVersionDescriptors as jest.Mock).mockReturnValue([
+    ];
+
+    const focusedDescriptors = [
       {
         dir: 'public/foo',
         name: 'focus',
@@ -75,125 +65,63 @@ describe('Resume export index', () => {
         name: 'focused',
         contents: 'baz',
       },
-    ]);
-    (getPrivateVersionDescriptors as jest.Mock).mockReturnValue([
+    ];
+
+    const privateDescriptors = [
       {
         dir: 'private',
         name: 'foo',
         contents: 'bar',
       },
-    ]);
+    ];
 
-    (getExportTasksFromDescriptor as jest.Mock).mockImplementation(
-      (
-        descriptor: FileDescriptor,
-        templates: RenderContextTemplates,
-        validateFn: Function
-      ) => ({
-        templates,
-        validateFn,
-        ...descriptor,
-      })
+    (getPublicVersionDescriptors as jest.Mock).mockReturnValue(
+      publicDescriptors
+    );
+    (getFocusedVersionDescriptors as jest.Mock).mockReturnValue(
+      focusedDescriptors
+    );
+    (getPrivateVersionDescriptors as jest.Mock).mockReturnValue(
+      privateDescriptors
     );
 
-    const expectedPublicTemplates = {
-      json: {
-        options: prettierOptions,
-        render: 'json',
-      },
-      html: {
-        options: prettierOptions,
-        ctx: { ...initialContext },
-        render: 'html',
-      },
-      md: {
-        options: prettierOptions,
-        render: 'markdown',
-      },
-      pdf: {
-        render: 'pdf',
-      },
-    };
+    const getExpectedTask = (descriptor: any, format: string) => ({
+      path: { descriptor, format },
+      src: descriptor.contents,
+      yielders: { yield: format },
+    });
 
-    const expectedFocusedTemplates = {
-      json: {
-        options: prettierOptions,
-        render: 'json',
-      },
-      md: {
-        options: prettierOptions,
-        render: 'markdown',
-      },
-    };
+    const expectedPublicTasks = publicDescriptors.flatMap((descriptor) =>
+      ['json', 'md', 'pdf', 'html'].map((format) => ({
+        title:
+          'PUBLIC - version: ' +
+          descriptor.name +
+          (descriptor.subversion ? ', sub: ' + descriptor.subversion : '') +
+          ' - ' +
+          format,
+        task: getExpectedTask(descriptor, format),
+      }))
+    );
 
-    const expectedTasks = [
-      {
-        title: 'PUBLIC - version: foo, sub: le',
-        task: {
-          validateFn: validateResumeWithSchema,
-          templates: {
-            ...expectedPublicTemplates,
-          },
-          dir: 'public',
-          name: 'foo',
-          subversion: 'le',
-          contents: 'bar',
-        },
-      },
-      {
-        title: 'PUBLIC - version: bar',
-        task: {
-          validateFn: validateResumeWithSchema,
-          templates: {
-            ...expectedPublicTemplates,
-          },
-          dir: 'publica',
-          name: 'bar',
-          contents: 'baz',
-        },
-      },
-      {
-        title: 'FOCUSED - version: foo',
-        task: {
-          validateFn: validateResumeWithSchema,
-          templates: {
-            ...expectedFocusedTemplates,
-          },
-          dir: 'public/foo',
-          name: 'focus',
-          contents: 'bar',
-        },
-      },
-      {
-        title: 'FOCUSED - version: bar',
-        task: {
-          validateFn: validateResumeWithSchema,
-          templates: {
-            ...expectedFocusedTemplates,
-          },
-          dir: 'publica/bar',
-          name: 'focused',
-          contents: 'baz',
-        },
-      },
-      {
-        title: 'PRIVATE - version: foo',
-        task: {
-          validateFn: validateResumeWithSchema,
-          templates: {
-            json: {
-              options: prettierOptions,
-              render: 'json',
-            },
-            pdf: {
-              render: 'pdf',
-            },
-          },
-          dir: 'private',
-          name: 'foo',
-          contents: 'bar',
-        },
-      },
+    const expectedFocusedTasks = focusedDescriptors.flatMap((descriptor) =>
+      ['json', 'md'].map((format) => ({
+        title:
+          'FOCUSED - version: ' + basename(descriptor.dir) + ' - ' + format,
+        task: getExpectedTask(descriptor, format),
+      }))
+    );
+
+    const expectedPrivateTasks = privateDescriptors.flatMap((descriptor) =>
+      ['json', 'pdf'].map((format) => ({
+        title: 'PRIVATE - version: ' + descriptor.name + ' - ' + format,
+        task: getExpectedTask(descriptor, format),
+      }))
+    );
+
+    const expectedTasks: any[] = [
+      ...expectedPublicTasks,
+      ...expectedFocusedTasks,
+      ...expectedPrivateTasks,
     ];
 
     await getExportTasksForAllResumeVersions(

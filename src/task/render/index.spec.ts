@@ -1,5 +1,5 @@
 import { ListrTaskWrapper } from 'listr2';
-import { render } from '.';
+import { getRenderingTasks } from '.';
 import type { RenderContext } from '../context';
 import { writeContextToFile } from './util';
 
@@ -33,7 +33,10 @@ describe('Rendering index', () => {
       preprocessFn: expect.anything(),
     };
 
-    const task = render('./foo/bar.html', 'start', [yielderFoo, yielderBar]);
+    const task = getRenderingTasks('./foo/bar.html', 'start', [
+      yielderFoo,
+      yielderBar,
+    ]);
     task(null, providedTask as ListrTaskWrapper<any, any>);
 
     expect(lister).toHaveBeenCalledWith(expectedTasks, {

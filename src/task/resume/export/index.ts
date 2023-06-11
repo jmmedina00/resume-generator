@@ -1,25 +1,15 @@
-import { Listr, ListrTask, ListrTaskWrapper } from 'listr2';
-import { ResumeContext } from '../../context';
-import { FileDescriptor } from '../../describe';
+import type { Listr, ListrTask, ListrTaskWrapper } from 'listr2';
+import type { ResumeContext } from '../../context';
+import { FileDescriptor, getDescribedPath } from '../../describe';
 import {
   getFocusedVersionDescriptors,
   getPrivateVersionDescriptors,
   getPublicVersionDescriptors,
 } from './descriptor';
-import {
-  getHtmlRender,
-  getJsonRender,
-  getMarkdownRender,
-  getPdfRender,
-  getPrettierOptions,
-  validateResumeWithSchema,
-} from './config';
-import {
-  RenderContextTemplates,
-  getExportTasksFromDescriptor,
-} from '../../export';
+import { htmlYielders, jsonYielders, mdYielders, pdfYielders } from './config';
 import { getFullTaskName } from '../../io/task';
 import { basename } from 'path';
+import { TaskYielder, getRenderingTasks } from '../../render';
 
 interface NameProvider {
   keyword: string;
@@ -31,25 +21,29 @@ const focusedNamer = ({ dir }: FileDescriptor) => `version: ${basename(dir)}`;
 const namer = ({ name, subversion }: FileDescriptor) =>
   `version: ${name}` + (!subversion ? '' : `, sub: ${subversion}`);
 
-const keywordedNamer =
+const newKeywordedNamer =
   ({ keyword, namer }: NameProvider) =>
-  (descriptor: FileDescriptor) =>
-    [keyword, namer(descriptor)].join(' - ');
+  (descriptor: FileDescriptor, format: string) =>
+    [keyword, namer(descriptor), format].join(' - ');
 
 const generateTasks =
   (
-    keyword: NameProvider,
-    templates: RenderContextTemplates,
+    nameProvider: NameProvider,
+    yielderCollections: { [key: string]: TaskYielder[] },
     task: ListrTaskWrapper<ResumeContext, any>
   ) =>
-  (descriptor: FileDescriptor): ListrTask<any, any> => ({
-    title: getFullTaskName(keywordedNamer(keyword)(descriptor), task),
-    task: getExportTasksFromDescriptor(
-      descriptor,
-      templates,
-      validateResumeWithSchema
-    ),
-  });
+  (descriptor: FileDescriptor): ListrTask<any, any>[] =>
+    Object.entries(yielderCollections).map(([format, yielders]) => ({
+      title: getFullTaskName(
+        newKeywordedNamer(nameProvider)(descriptor, format),
+        task
+      ),
+      task: getRenderingTasks(
+        getDescribedPath(descriptor, format),
+        descriptor.contents,
+        yielders
+      ),
+    }));
 
 export const getExportTasksForAllResumeVersions = async (
   ctx: ResumeContext,
@@ -58,18 +52,20 @@ export const getExportTasksForAllResumeVersions = async (
   const publicDescriptors = getPublicVersionDescriptors(ctx);
   const focusedDescriptors = getFocusedVersionDescriptors(ctx);
   const privateDescriptors = getPrivateVersionDescriptors(ctx);
-  const prettierOptions = await getPrettierOptions();
 
-  const json = await getJsonRender(prettierOptions);
-  const html = await getHtmlRender(prettierOptions, ctx);
-  const md = await getMarkdownRender(prettierOptions);
-  const pdf = await getPdfRender();
+  const json = jsonYielders();
+  const md = mdYielders();
+  const pdf = pdfYielders();
 
-  const publicTasks = publicDescriptors.map(
-    generateTasks({ keyword: 'PUBLIC', namer }, { json, html, md, pdf }, task)
+  const publicTasks = publicDescriptors.flatMap((descriptor) =>
+    generateTasks(
+      { keyword: 'PUBLIC', namer },
+      { json, md, pdf, html: htmlYielders(ctx, descriptor.name) }, // Navbar parameter is quite overloading...
+      task
+    )(descriptor)
   );
 
-  const focusedTasks = focusedDescriptors.map(
+  const focusedTasks = focusedDescriptors.flatMap(
     generateTasks(
       { keyword: 'FOCUSED', namer: focusedNamer },
       { json, md },
@@ -77,7 +73,7 @@ export const getExportTasksForAllResumeVersions = async (
     )
   );
 
-  const privateTasks = privateDescriptors.map(
+  const privateTasks = privateDescriptors.flatMap(
     generateTasks({ keyword: 'PRIVATE', namer }, { json, pdf }, task)
   );
 

@@ -1,7 +1,7 @@
 import type { ListrTaskWrapper } from 'listr2';
 import { getRecursiveFileList } from '../../util/io';
 import { extname } from 'path';
-import { render } from '../render';
+import { getRenderingTasks } from '../render';
 import { getFullTaskName } from '../io/task';
 import { getYielders } from './yielder';
 
@@ -16,7 +16,7 @@ export const getMarkdownRenderingTasks =
 
         return {
           title: getFullTaskName(file, task),
-          task: render(desiredPath, 'fromfile', getYielders(file)),
+          task: getRenderingTasks(desiredPath, 'fromfile', getYielders(file)),
         };
       });
 
