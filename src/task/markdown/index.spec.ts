@@ -1,16 +1,12 @@
 import { ListrTaskWrapper } from 'listr2';
 import { getRecursiveFileList } from '../../util/io';
-import { Options } from 'prettier';
-import { getPrettierOptions } from '../resume/export/config';
-import { getRenderingTasks } from '../render';
-import { parseMarkdownIntoDocument } from './render';
+import { TaskYielder, render } from '../render';
 import { getMarkdownRenderingTasks } from '.';
-import { readFile } from 'fs/promises';
+import { getYielders } from './yielder';
 
-jest.mock('../resume/export/config');
 jest.mock('../../util/io');
 jest.mock('../render');
-jest.mock('fs/promises');
+jest.mock('./yielder');
 jest.mock('../io/task');
 
 describe('Markdown rendering tasks', () => {
@@ -30,66 +26,63 @@ describe('Markdown rendering tasks', () => {
       './do/not/enter/secret.md',
     ];
 
-    const options: Options = { tabWidth: 7, trailingComma: 'es5' };
-    (getPrettierOptions as jest.Mock).mockResolvedValue(options);
-    (readFile as jest.Mock).mockResolvedValue('Read file');
-
+    (getYielders as jest.Mock).mockImplementation((path) => [
+      (foo: any) => ({ title: 'Do everything with ' + path, task: 'fizzbuzz' }),
+    ]);
     (getRecursiveFileList as jest.Mock).mockResolvedValue(paths);
-    (getRenderingTasks as jest.Mock).mockImplementation((ctx) => ({
-      ...ctx,
-    }));
+    (render as jest.Mock).mockImplementation(
+      (path: string, contents: string, yielders: TaskYielder[]) => ({
+        path,
+        contents,
+        tasks: yielders.flatMap((yielder) =>
+          yielder({} as ListrTaskWrapper<any, any>)
+        ),
+      })
+    );
 
     const expectedTasks = [
       {
         title: './folder/file.md',
         task: {
           path: './folder/file.md.html',
-          contents: 'Read file',
-          preprocessFn: parseMarkdownIntoDocument,
-          prettierOptions: {
-            tabWidth: 7,
-            trailingComma: 'es5',
-            parser: 'html',
-          },
+          contents: 'fromfile',
+          tasks: [
+            { title: 'Do everything with ./folder/file.md', task: 'fizzbuzz' },
+          ],
         },
       },
       {
         title: './lessons/summary.md',
         task: {
           path: './lessons/summary.md.html',
-          contents: 'Read file',
-          preprocessFn: parseMarkdownIntoDocument,
-          prettierOptions: {
-            tabWidth: 7,
-            trailingComma: 'es5',
-            parser: 'html',
-          },
+          contents: 'fromfile',
+          tasks: [
+            {
+              title: 'Do everything with ./lessons/summary.md',
+              task: 'fizzbuzz',
+            },
+          ],
         },
       },
       {
         title: './test.md',
         task: {
           path: './test.md.html',
-          contents: 'Read file',
-          preprocessFn: parseMarkdownIntoDocument,
-          prettierOptions: {
-            tabWidth: 7,
-            trailingComma: 'es5',
-            parser: 'html',
-          },
+          contents: 'fromfile',
+          tasks: [{ title: 'Do everything with ./test.md', task: 'fizzbuzz' }],
         },
       },
       {
         title: './do/not/enter/secret.md',
         task: {
           path: './do/not/enter/secret.md.html',
-          contents: 'Read file',
-          preprocessFn: parseMarkdownIntoDocument,
-          prettierOptions: {
-            tabWidth: 7,
-            trailingComma: 'es5',
-            parser: 'html',
-          },
+          contents: 'fromfile',
+          tasks: [
+            {
+              title: 'Do everything with ./do/not/enter/secret.md',
+              task: 'fizzbuzz',
+            },
+          ],
         },
       },
     ];
