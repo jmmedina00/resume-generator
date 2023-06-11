@@ -5,6 +5,7 @@ import { applyTemplateToObjectResource } from '.';
 
 jest.mock('../../transform');
 jest.mock('./transform');
+jest.mock('../../../io/task');
 
 describe('Template yielders', () => {
   it('should provide applying template parameters with given functions', () => {

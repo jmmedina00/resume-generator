@@ -3,6 +3,8 @@ import { getRenderingTasks } from '.';
 import type { RenderContext } from '../context';
 import { writeContextToFile } from './util';
 
+jest.mock('../io/task');
+
 describe('Rendering index', () => {
   it('should consolidate render parameters and additional yielders into task list initialized with correct context', () => {
     const lister = jest.fn().mockReturnValue({ listed: true });
