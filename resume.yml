@@ -54,6 +54,26 @@ certificates:
     important: false
 
 projects:
+  freedom-flagger:
+    type: application
+    repo-description: en
+    page-active: yes
+
+    description:
+      es: Generador de banderas que ocultan información
+    highlights:
+      - en: Generates complex SVGs based on inputs
+        es: Genera documentos SVG complejos basados en parámetros
+
+      - en: Allows to copy or download a raster version of the flag
+        es: Permite descargar una imagen de la bandera
+
+      - en: Features different views to read/modify the number
+        es: Diferentes vistas para cambiar el número en uso
+
+    startDate: 2023-06-14
+    endDate: 2023-09-01
+
   rolldapass:
     type: application
     repo-description: en
