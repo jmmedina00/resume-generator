@@ -28,6 +28,11 @@ languages:
       en: French
     fluency: B1
     important: false
+  - language:
+      es: Alemán
+      en: German
+    fluency: B1
+    important: false
 
 certificates:
   - name: 'Microsoft Certified: Dynamics 365 Fundamentals (CRM)'
@@ -149,6 +154,39 @@ skills:
       - Microsoft Azure
 
 work:
+  minsait-legacy:
+    name: Minsait
+    important: true
+    url: https://www.minsait.com/
+    position:
+      en: Software developer
+      es: Desarrollador de software
+    startDate: 2025-09-29
+    summary:
+      en: Development of legacy-oriented medical management platform
+      es: Desarrollo de plataforma de gestión médica orientada a sistemas legacy
+    highlights:
+      - Backbone, Marionette & Underscore
+      - jQuery
+      - Spring
+
+  tsystems-dev:
+    name: T-Systems
+    important: false
+    url: https://www.t-systems.com/
+    position:
+      en: Software developer
+      es: Desarrollador de software
+    startDate: 2025-07-21
+    endDate: 2025-09-26
+    summary:
+      en: Development of national innovation platform
+      es: Desarrollo de plataforma de innovación nacional
+    highlights:
+      - Angular
+      - Vue
+      - Java
+
   ey-dev:
     name: EY
     important: true
@@ -157,6 +195,7 @@ work:
       en: Full-Stack Developer
       es: Desarrollador full-stack
     startDate: 2023-01-23
+    endDate: 2025-07-18
     summary:
       en: Development of in-house accounting project management platform
       es: Desarrollo de plataforma interna para administrar proyectos de contabilidad
